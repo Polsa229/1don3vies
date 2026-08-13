@@ -1,16 +1,16 @@
-import { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 /**
  * A syringe whose red fluid level decreases as the user scrolls down,
  * symbolizing the act of giving blood. Uses Framer Motion's useScroll
  * to track progress through the section and maps it to the fill height.
  */
-export function SyringeScroll({ className = '' }: { className?: string }) {
+export function SyringeScroll({ className = "" }: { className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ['start end', 'end start'],
+    offset: ["start end", "end start"],
   });
 
   // Fluid goes from 100% → 5% as user scrolls through the section
@@ -33,13 +33,13 @@ export function SyringeScroll({ className = '' }: { className?: string }) {
               <div
                 key={i}
                 className="w-2 h-px bg-warmgray-300"
-                style={{ alignSelf: 'flex-end' }}
+                style={{ alignSelf: "flex-end" }}
               />
             ))}
           </div>
           {/* Red fluid */}
           <motion.div
-            className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-accent-600 to-bordeaux-500"
+            className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-accent-600 to-primary-500"
             style={{
               height: useTransform(fluidHeight, (v) => `${v}%`),
               opacity: fluidOpacity,
@@ -66,7 +66,7 @@ export function SyringeScroll({ className = '' }: { className?: string }) {
           transition={{
             duration: 2,
             repeat: Infinity,
-            ease: 'easeIn',
+            ease: "easeIn",
           }}
         />
       </div>

@@ -23,7 +23,7 @@ export function DotGlobeWatermark() {
         aria-hidden="true"
       >
         {/* Connection lines */}
-        <g stroke="#6B2737" strokeWidth="0.8" strokeDasharray="4 4">
+        <g stroke="#8F2346" strokeWidth="0.8" strokeDasharray="4 4">
           <line x1="200" y1="180" x2="400" y2="120" />
           <line x1="400" y1="120" x2="600" y2="200" />
           <line x1="200" y1="180" x2="350" y2="400" />
@@ -37,7 +37,7 @@ export function DotGlobeWatermark() {
           [200, 180], [400, 120], [600, 200],
           [350, 400], [500, 420], [300, 300], [550, 320],
         ].map(([cx, cy], i) => (
-          <circle key={i} cx={cx} cy={cy} r="4" fill="#6B2737" />
+          <circle key={i} cx={cx} cy={cy} r="4" fill="#8F2346" />
         ))}
       </svg>
     </div>

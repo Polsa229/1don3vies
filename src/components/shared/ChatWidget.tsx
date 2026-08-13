@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useI18n } from '@/i18n/I18nContext';
+import { useI18n } from '@/i18n/useI18n';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send, Droplet } from 'lucide-react';
 
@@ -39,7 +39,7 @@ const ANSWERS_EN: Record<string, string> = {
 };
 
 export function ChatWidget() {
-  const { t, lang } = useI18n();
+  const { lang } = useI18n();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -76,7 +76,7 @@ export function ChatWidget() {
       {/* Toggle button */}
       <motion.button
         onClick={() => setOpen(!open)}
-        className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-accent-600 text-white shadow-xl shadow-accent-600/30 flex items-center justify-center hover:bg-accent-700 transition-colors"
+        className="fixed bottom-20 right-6 lg:bottom-6 z-40 w-14 h-14 rounded-full bg-primary-600 text-white shadow-xl shadow-primary-600/30 flex items-center justify-center hover:bg-primary-700 transition-colors"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         aria-label={lang === 'fr' ? 'Ouvrir le chat' : 'Open chat'}
@@ -87,7 +87,7 @@ export function ChatWidget() {
       <AnimatePresence>
         {open && (
           <motion.div
-            className="fixed bottom-24 right-6 z-40 w-[calc(100vw-3rem)] max-w-sm bg-white rounded-2xl shadow-2xl border border-warmgray-200/50 overflow-hidden flex flex-col"
+            className="fixed bottom-36 right-6 lg:bottom-24 z-40 w-[calc(100vw-3rem)] max-w-sm bg-white rounded-2xl shadow-2xl border border-warmgray-200/50 overflow-hidden flex flex-col"
             style={{ height: 420 }}
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -95,11 +95,11 @@ export function ChatWidget() {
             transition={{ duration: 0.2 }}
           >
             {/* Header */}
-            <div className="bg-bordeaux-700 text-ivory-50 px-4 py-3 flex items-center gap-2">
+            <div className="bg-primary-700 text-ivory-50 px-4 py-3 flex items-center gap-2">
               <Droplet className="w-5 h-5" fill="currentColor" />
               <div>
                 <p className="font-display text-sm font-medium">HemoLink Assistant</p>
-                <p className="text-xs text-bordeaux-200">
+                <p className="text-xs text-primary-200">
                   {lang === 'fr' ? 'En ligne' : 'Online'}
                 </p>
               </div>
@@ -119,7 +119,7 @@ export function ChatWidget() {
                       <button
                         key={q}
                         onClick={() => handleQuick(q)}
-                        className="block w-full text-left px-3 py-2 text-sm rounded-lg bg-white border border-warmgray-200 text-warmgray-700 hover:border-bordeaux-300 hover:text-bordeaux-700 transition-colors"
+                        className="block w-full text-left px-3 py-2 text-sm rounded-lg bg-white border border-warmgray-200 text-warmgray-700 hover:border-primary-300 hover:text-primary-700 transition-colors"
                       >
                         {q}
                       </button>
@@ -135,7 +135,7 @@ export function ChatWidget() {
                   <div
                     className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm leading-relaxed ${
                       msg.role === 'user'
-                        ? 'bg-bordeaux-700 text-ivory-50 rounded-br-sm'
+                        ? 'bg-primary-700 text-ivory-50 rounded-br-sm'
                         : 'bg-white border border-warmgray-200 text-warmgray-700 rounded-bl-sm'
                     }`}
                   >
@@ -152,11 +152,11 @@ export function ChatWidget() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                 placeholder={lang === 'fr' ? 'Écrivez un message...' : 'Type a message...'}
-                className="flex-1 px-3 py-2 text-sm bg-ivory-50 rounded-lg border border-warmgray-200 focus:border-bordeaux-300 focus:outline-none text-warmgray-700 placeholder-warmgray-400"
+                className="flex-1 px-3 py-2 text-sm bg-ivory-50 rounded-lg border border-warmgray-200 focus:border-primary-300 focus:outline-none text-warmgray-700 placeholder-warmgray-400"
               />
               <button
                 onClick={handleSend}
-                className="w-9 h-9 rounded-lg bg-bordeaux-700 text-ivory-50 flex items-center justify-center hover:bg-bordeaux-800 transition-colors shrink-0"
+                className="w-9 h-9 rounded-lg bg-primary-700 text-ivory-50 flex items-center justify-center hover:bg-primary-800 transition-colors shrink-0"
                 aria-label={lang === 'fr' ? 'Envoyer' : 'Send'}
               >
                 <Send className="w-4 h-4" />

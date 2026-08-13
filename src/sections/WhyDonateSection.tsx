@@ -5,8 +5,8 @@ import { InkBlot } from '@/components/shared/InkBlot';
 import { Play, Heart, Users, Activity } from 'lucide-react';
 
 const VIDEO_ID = '0aJ5x93pAvU';
-const VIDEO_START = 10;
-const VIDEO_END = 120;
+const VIDEO_START = 63;
+const VIDEO_END = 170;
 
 export function WhyDonateSection() {
   const { t, lang } = useI18n();

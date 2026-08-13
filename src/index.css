@@ -53,6 +53,14 @@
   }
 }
 
+.dot-globe {
+    background-image: radial-gradient(circle, rgba(107, 39, 55, 0.18) 1px, transparent 1.5px);
+    background-size: 14px 14px;
+    mask-image: radial-gradient(ellipse at center, black 15%, transparent 72%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 15%, transparent 72%);
+    transform: rotate(-14deg) scale(1.2);
+  }
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

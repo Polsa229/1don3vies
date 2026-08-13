@@ -3,7 +3,18 @@ import type { Center } from '@/features/eligibility/eligibility.types';
 const DAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
 type DayKey = (typeof DAYS)[number];
 
-export function getCenterStatus(center: Center, now: Date = new Date()): { isOpen: boolean; todayHours: string } {
+/**
+ * Calcule si un centre est ouvert à l'instant donné (par défaut : maintenant).
+ * Purement client-side, aucune donnée dynamique/backend nécessaire.
+ */
+export function isCenterOpenNow(center: Center, now: Date = new Date()): boolean {
+  return getCenterStatus(center, now).isOpen;
+}
+
+export function getCenterStatus(
+  center: Center,
+  now: Date = new Date(),
+): { isOpen: boolean; todayHours: string } {
   const dayIdx = now.getDay();
   const dayKey = DAYS[dayIdx] as DayKey;
   const todayHours = center.hours[dayKey];
@@ -30,9 +41,9 @@ export function haversineDistance(
   lat1: number,
   lng1: number,
   lat2: number,
-  lng2: number
+  lng2: number,
 ): number {
-  const R = 6371; // Earth radius in km
+  const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLng = ((lng2 - lng1) * Math.PI) / 180;
   const a =

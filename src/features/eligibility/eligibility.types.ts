@@ -38,11 +38,15 @@ export interface Center {
   appointmentRequired: boolean;
 }
 
+export type CampaignLifecycle = 'upcoming' | 'ongoing' | 'ended';
+
 export interface Campaign {
   id: string;
   name: string;
   location: string;
   city: string;
+  lat: number;
+  lng: number;
   date: string;
   endDate: string;
   startTime: string;
@@ -50,6 +54,10 @@ export interface Campaign {
   organizer: string;
   partner: string;
   soughtGroups: BloodGroup[];
+  donationTypes: DonationType[];
+  appointmentRequired: boolean;
+  /** Poches collectées (renseigné surtout pour les campagnes terminées). */
+  bagsCollected?: number;
 }
 
 export interface BloodReserve {

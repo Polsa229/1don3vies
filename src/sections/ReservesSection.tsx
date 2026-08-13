@@ -1,33 +1,98 @@
-import { useI18n } from '@/i18n/I18nContext';
+import { useI18n } from '@/i18n/useI18n';
 import { SectionHeading } from '@/components/shared/SectionHeading';
 import { InkBlot } from '@/components/shared/InkBlot';
 import { bloodReserves } from '@/data/bloodReserves.data';
 import type { NeedLevel } from '@/features/eligibility/eligibility.types';
-import { AlertCircle, Info, Globe } from 'lucide-react';
+import { Info, Globe } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { fadeUp, staggerContainer, viewportOnce } from '@/lib/motion';
 
-const levelConfig: Record<NeedLevel, { bg: string; bar: string; text: string; labelKey: string; dot: string }> = {
+const BLOCKS = 5;
+
+const levelConfig: Record<
+  NeedLevel,
+  {
+    bg: string;
+    fill: string;
+    empty: string;
+    text: string;
+    labelKey: string;
+    /** How many of 5 blocks are filled (stock metaphor: high need = low stock). */
+    filled: number;
+  }
+> = {
   high: {
-    bg: 'bg-bordeaux-50',
-    bar: 'bg-bordeaux-600',
-    text: 'text-bordeaux-700',
+    bg: 'bg-primary-50',
+    fill: 'bg-primary-700',
+    empty: 'bg-primary-100',
+    text: 'text-primary-700',
     labelKey: 'reserves.level.high',
-    dot: 'bg-bordeaux-500',
+    filled: 2,
   },
   moderate: {
     bg: 'bg-accent-50',
-    bar: 'bg-accent-400',
+    fill: 'bg-accent-500',
+    empty: 'bg-accent-100',
     text: 'text-accent-700',
     labelKey: 'reserves.level.moderate',
-    dot: 'bg-accent-400',
+    filled: 3,
   },
   normal: {
     bg: 'bg-success-50',
-    bar: 'bg-success-400',
+    fill: 'bg-success-500',
+    empty: 'bg-success-100',
     text: 'text-success-700',
     labelKey: 'reserves.level.normal',
-    dot: 'bg-success-400',
+    filled: 5,
   },
 };
+
+function NeedBlocks({
+  filled,
+  fillClass,
+  emptyClass,
+  textClass,
+  label,
+  delay = 0,
+}: {
+  filled: number;
+  fillClass: string;
+  emptyClass: string;
+  textClass: string;
+  label: string;
+  delay?: number;
+}) {
+  return (
+    <div className="mb-3">
+      <div className="flex items-center justify-between gap-3 mb-2.5">
+        <span className={`text-sm font-semibold ${textClass}`}>{label}</span>
+        <span className={`text-xs font-bold tabular-nums ${textClass}`}>
+          {filled}/{BLOCKS}
+        </span>
+      </div>
+      <div className="grid grid-cols-5 gap-1.5">
+        {Array.from({ length: BLOCKS }, (_, i) => {
+          const active = i < filled;
+          return (
+            <motion.div
+              key={i}
+              className={`h-2.5 rounded-sm ${active ? fillClass : emptyClass}`}
+              initial={{ scaleX: 0, opacity: 0.4 }}
+              whileInView={{ scaleX: 1, opacity: 1 }}
+              viewport={{ once: true, amount: 0.6 }}
+              transition={{
+                duration: 0.35,
+                delay: delay + i * 0.08,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              style={{ originX: 0 }}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export function ReservesSection() {
   const { t, lang } = useI18n();
@@ -36,7 +101,7 @@ export function ReservesSection() {
     <section id="reserves" className="relative py-24 lg:py-32 bg-ivory-100 overflow-hidden">
       <InkBlot
         variant={4}
-        color="#8B3147"
+        color="#691735"
         className="absolute -top-20 -right-32 w-[400px] h-[560px] opacity-[0.03]"
       />
 
@@ -47,63 +112,57 @@ export function ReservesSection() {
           subtitleKey="reserves.subtitle"
         />
 
-        {/* Blood group cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {bloodReserves.map((reserve) => {
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+        >
+          {bloodReserves.map((reserve, index) => {
             const config = levelConfig[reserve.level];
             return (
-              <div
+              <motion.div
                 key={reserve.group}
-                className={`rounded-2xl p-6 border border-warmgray-200/50 shadow-sm transition-all duration-300 hover:shadow-md ${config.bg}`}
+                variants={fadeUp}
+                whileHover={{ y: -4 }}
+                className={`rounded-2xl p-5 sm:p-6 border border-warmgray-200/50 shadow-sm transition-shadow duration-300 hover:shadow-md ${config.bg}`}
               >
-                {/* Group name */}
                 <div className="flex items-center justify-between mb-4">
-                  <span className="font-display text-3xl font-medium text-bordeaux-900">
+                  <span className="font-display text-3xl font-medium text-primary-900">
                     {reserve.group}
                   </span>
                   {reserve.rare && (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-bordeaux-700 text-ivory-50">
-                      {lang === 'fr' ? 'Rare' : 'Rare'}
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary-700 text-ivory-50">
+                      Rare
                     </span>
                   )}
                 </div>
 
-                {/* Need level indicator */}
-                <div className="mb-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className={`w-2 h-2 rounded-full ${config.dot}`} />
-                    <span className={`text-sm font-semibold ${config.text}`}>
-                      {t(config.labelKey as never)}
-                    </span>
-                  </div>
-                  {/* Visual bar */}
-                  <div className="h-1.5 bg-white/60 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full ${config.bar} transition-all duration-500`}
-                      style={{
-                        width: reserve.level === 'high' ? '90%' : reserve.level === 'moderate' ? '55%' : '25%',
-                      }}
-                    />
-                  </div>
-                </div>
+                <NeedBlocks
+                  filled={config.filled}
+                  fillClass={config.fill}
+                  emptyClass={config.empty}
+                  textClass={config.text}
+                  label={t(config.labelKey as never)}
+                  delay={0.05 + index * 0.04}
+                />
 
-                {/* Description */}
                 <p className="text-xs text-warmgray-600 leading-relaxed">
                   {lang === 'fr' ? reserve.description.fr : reserve.description.en}
                 </p>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
 
-        {/* Rare groups explanation */}
         <div className="mt-10 bg-white rounded-2xl border border-warmgray-200/50 shadow-sm p-6 sm:p-8">
           <div className="flex items-start gap-4">
-            <div className="shrink-0 w-11 h-11 rounded-xl bg-bordeaux-50 flex items-center justify-center">
-              <Globe className="w-5 h-5 text-bordeaux-600" />
+            <div className="shrink-0 w-11 h-11 rounded-xl bg-primary-50 flex items-center justify-center">
+              <Globe className="w-5 h-5 text-primary-600" />
             </div>
             <div>
-              <h3 className="font-display text-lg text-bordeaux-900 mb-2">
+              <h3 className="font-display text-lg text-primary-900 mb-2">
                 {lang === 'fr' ? 'La diversité des donneurs compte' : 'Donor diversity matters'}
               </h3>
               <p className="text-sm text-warmgray-600 leading-relaxed">
@@ -113,7 +172,6 @@ export function ReservesSection() {
           </div>
         </div>
 
-        {/* Disclaimer */}
         <div className="mt-6 flex items-start gap-2 text-sm text-warmgray-500 italic">
           <Info className="w-4 h-4 mt-0.5 shrink-0" />
           <span>{t('reserves.disclaimer')}</span>

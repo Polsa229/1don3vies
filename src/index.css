@@ -1,10 +1,35 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Leaflet: keep map under app overlays (modals, sheets) */
+.leaflet-container {
+  font: inherit;
+  background: #faf8f5;
+}
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  box-shadow: 0 12px 32px -12px rgba(36, 28, 32, 0.25);
+}
+.leaflet-popup-content {
+  margin: 12px 14px;
+}
+
 @layer base {
+  :root {
+    --color-primary: #8f2346;
+    --color-primary-dark: #691735;
+    --color-accent: #e86a5b;
+    --color-background: #faf8f5;
+    --color-surface: #ffffff;
+    --color-foreground: #241c20;
+    --color-muted: #6f6669;
+    --color-border: #e8e1e2;
+    --color-success: #267a5a;
+    --color-warning: #b7791f;
+    --color-error: #b4233e;
+  }
+
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
@@ -12,17 +37,16 @@
   }
 
   body {
-    @apply bg-ivory-50 text-warmgray-900 font-sans antialiased;
+    @apply bg-background text-foreground font-sans antialiased;
     overflow-x: hidden;
   }
 
   ::selection {
-    @apply bg-bordeaux-200 text-bordeaux-900;
+    @apply bg-primary-200 text-primary-900;
   }
 
-  /* Visible focus everywhere */
   *:focus-visible {
-    @apply outline-none ring-2 ring-bordeaux-500 ring-offset-2 ring-offset-ivory-50 rounded-md;
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background rounded-md;
   }
 }
 
@@ -36,7 +60,7 @@
   }
 
   .heading-display {
-    @apply font-display font-light tracking-tight text-bordeaux-900;
+    @apply font-display font-light tracking-tight text-primary-900;
   }
 
   .ink-blot {
@@ -54,12 +78,12 @@
 }
 
 .dot-globe {
-    background-image: radial-gradient(circle, rgba(107, 39, 55, 0.18) 1px, transparent 1.5px);
-    background-size: 14px 14px;
-    mask-image: radial-gradient(ellipse at center, black 15%, transparent 72%);
-    -webkit-mask-image: radial-gradient(ellipse at center, black 15%, transparent 72%);
-    transform: rotate(-14deg) scale(1.2);
-  }
+  background-image: radial-gradient(circle, rgba(143, 35, 70, 0.18) 1px, transparent 1.5px);
+  background-size: 14px 14px;
+  mask-image: radial-gradient(ellipse at center, black 15%, transparent 72%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 15%, transparent 72%);
+  transform: rotate(-14deg) scale(1.2);
+}
 
 @layer utilities {
   .text-balance {

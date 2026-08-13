@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useI18n } from '@/i18n/I18nContext';
 import { SectionHeading } from '@/components/shared/SectionHeading';
 import { InkBlot } from '@/components/shared/InkBlot';
@@ -10,11 +10,12 @@ import { getCenterStatus, haversineDistance } from '@/features/centers/centers.l
 import { centers as allCenters } from '@/data/centers.data';
 import { campaigns as allCampaigns } from '@/data/campaigns.data';
 import type { Center, Campaign, DonationType, BloodGroup } from '@/features/eligibility/eligibility.types';
-import { Search, MapPin, Clock, Phone, Mail, Calendar, Users, Navigation, AlertCircle, Building2, Heart, Info } from 'lucide-react';
+import { Search, MapPin, Clock, Phone, Mail, Calendar, Users, Navigation, AlertCircle, Building2, Heart, Info, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 type Tab = 'permanent' | 'campaigns';
 
-export function CentersSection() {
+export function CentersSection({ limit }: { limit?: number } = {}) {
   const { t, lang } = useI18n();
   const [tab, setTab] = useState<Tab>('permanent');
 
@@ -61,13 +62,13 @@ export function CentersSection() {
           </div>
         </div>
 
-        {tab === 'permanent' ? <PermanentCenters /> : <CampaignsView />}
+        {tab === 'permanent' ? <PermanentCenters limit={limit} /> : <CampaignsView />}
       </div>
     </section>
   );
 }
 
-function PermanentCenters() {
+function PermanentCenters({ limit }: { limit?: number } = {}) {
   const { t, lang } = useI18n();
   const [search, setSearch] = useState('');
   const [cityFilter, setCityFilter] = useState('all');
@@ -81,6 +82,21 @@ function PermanentCenters() {
   useMemo(() => {
     setTimeout(() => setLoading(false), 600);
   }, []);
+
+  // When geolocation succeeds, find nearest center and update city filter
+  useEffect(() => {
+    if (geo.coords) {
+      const nearest = allCenters
+        .map((c) => ({
+          city: c.city,
+          dist: haversineDistance(geo.coords!.lat, geo.coords!.lng, c.lat, c.lng),
+        }))
+        .sort((a, b) => a.dist - b.dist)[0];
+      if (nearest) {
+        setCityFilter(nearest.city);
+      }
+    }
+  }, [geo.coords]);
 
   const cities = useMemo(() => {
     return Array.from(new Set(allCenters.map((c) => c.city))).sort();
@@ -122,6 +138,8 @@ function PermanentCenters() {
 
     return result;
   }, [search, cityFilter, typeFilter, appointmentFilter, geo.coords]);
+
+  const displayed = limit ? filtered.slice(0, limit) : filtered;
 
   return (
     <div>
@@ -202,25 +220,38 @@ function PermanentCenters() {
       {/* Results */}
       {loading ? (
         <CentersSkeleton />
-      ) : filtered.length === 0 ? (
+      ) : displayed.length === 0 ? (
         <NoResults
           message={t('centers.noResults')}
           suggestion={t('centers.noResults.suggestion')}
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {filtered.map((center) => (
-            <CenterCard
-              key={center.id}
-              center={center}
-              distance={
-                geo.coords
-                  ? haversineDistance(geo.coords.lat, geo.coords.lng, center.lat, center.lng)
-                  : null
-              }
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {displayed.map((center) => (
+              <CenterCard
+                key={center.id}
+                center={center}
+                distance={
+                  geo.coords
+                    ? haversineDistance(geo.coords.lat, geo.coords.lng, center.lat, center.lng)
+                    : null
+                }
+              />
+            ))}
+          </div>
+          {limit && filtered.length > limit && (
+            <div className="text-center mt-10">
+              <Link
+                to="/centres"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-bordeaux-700 text-ivory-50 font-medium text-sm hover:bg-bordeaux-800 transition-colors group"
+              >
+                {lang === 'fr' ? 'Voir tous les centres' : 'View all centers'}
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

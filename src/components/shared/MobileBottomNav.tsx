@@ -1,10 +1,11 @@
-import { Home, MapPin, HelpCircle } from 'lucide-react';
+import { Home, MapPin, HelpCircle, ClipboardCheck } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useI18n } from '@/i18n/useI18n';
 import { goHome, goToSection } from '@/lib/navigation';
 
 const ITEMS = [
   { id: 'home', icon: Home, labelKey: 'mobileNav.home' as const },
+  { id: 'eligibility', icon: ClipboardCheck, labelKey: 'mobileNav.eligibility' as const },
   { id: 'centers', icon: MapPin, labelKey: 'mobileNav.centers' as const },
   { id: 'faq', icon: HelpCircle, labelKey: 'mobileNav.faq' as const },
 ] as const;
@@ -23,6 +24,10 @@ export function MobileBottomNav() {
       goHome({ pathname: location.pathname, navigate });
       return;
     }
+    if (id === 'eligibility') {
+      goToSection('eligibility', { pathname: location.pathname, navigate });
+      return;
+    }
     if (id === 'centers') {
       if (onCentres) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -37,12 +42,13 @@ export function MobileBottomNav() {
   return (
     <nav
       className="fixed bottom-0 inset-x-0 z-40 lg:hidden border-t border-warmgray-200/80 bg-surface/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)]"
-      aria-label="Navigation mobile"
+      aria-label={t('mobileNav.label' as never)}
     >
-      <div className="grid grid-cols-3 max-w-lg mx-auto">
+      <div className="grid grid-cols-4 max-w-lg mx-auto">
         {ITEMS.map(({ id, icon: Icon, labelKey }) => {
           const active =
             (id === 'home' && location.pathname === '/' && !location.hash) ||
+            (id === 'eligibility' && location.hash === '#eligibility') ||
             (id === 'centers' && onCentres) ||
             (id === 'faq' && location.hash === '#faq');
 
@@ -52,7 +58,7 @@ export function MobileBottomNav() {
               type="button"
               onClick={() => handle(id)}
               className={`flex flex-col items-center gap-1 py-2.5 text-[11px] font-semibold transition-colors ${
-                active ? 'text-primary' : 'text-warmgray-500 hover:text-primary-700'
+                active ? 'text-primary' : 'text-warmgray-600 hover:text-primary-700'
               }`}
             >
               <Icon className="w-5 h-5" strokeWidth={active ? 2.2 : 1.7} />

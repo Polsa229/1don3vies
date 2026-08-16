@@ -65,7 +65,7 @@ function NeedBlocks({
   return (
     <div className="mb-3">
       <div className="flex items-center justify-between gap-3 mb-2.5">
-        <span className={`text-sm font-semibold ${textClass}`}>{label}</span>
+        <span className={`text-xs sm:text-sm font-semibold ${textClass}`}>{label}</span>
         <span className={`text-xs font-bold tabular-nums ${textClass}`}>
           {filled}/{BLOCKS}
         </span>
@@ -98,7 +98,7 @@ export function ReservesSection() {
   const { t, lang } = useI18n();
 
   return (
-    <section id="reserves" className="relative py-24 lg:py-32 bg-ivory-100 overflow-hidden">
+    <section id="reserves" className="relative py-8 lg:py-24 bg-ivory-100 overflow-hidden">
       <InkBlot
         variant={4}
         color="#691735"
@@ -113,7 +113,7 @@ export function ReservesSection() {
         />
 
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
@@ -126,10 +126,10 @@ export function ReservesSection() {
                 key={reserve.group}
                 variants={fadeUp}
                 whileHover={{ y: -4 }}
-                className={`rounded-2xl p-5 sm:p-6 border border-warmgray-200/50 shadow-sm transition-shadow duration-300 hover:shadow-md ${config.bg}`}
+                className={`rounded-2xl p-3.5 sm:p-6 border border-warmgray-200/50 shadow-sm transition-shadow duration-300 hover:shadow-md ${config.bg}`}
               >
-                <div className="flex items-center justify-between mb-4">
-                  <span className="font-display text-3xl font-medium text-primary-900">
+                <div className="flex items-center justify-between mb-3 sm:mb-4">
+                  <span className="font-display text-2xl sm:text-3xl font-medium text-primary-900">
                     {reserve.group}
                   </span>
                   {reserve.rare && (
@@ -148,7 +148,7 @@ export function ReservesSection() {
                   delay={0.05 + index * 0.04}
                 />
 
-                <p className="text-xs text-warmgray-600 leading-relaxed">
+                <p className="text-[11px] sm:text-xs text-warmgray-600 leading-relaxed line-clamp-3">
                   {lang === 'fr' ? reserve.description.fr : reserve.description.en}
                 </p>
               </motion.div>
@@ -172,7 +172,7 @@ export function ReservesSection() {
           </div>
         </div>
 
-        <div className="mt-6 flex items-start gap-2 text-sm text-warmgray-500 italic">
+        <div className="mt-6 flex items-start gap-2 text-sm text-warmgray-600 italic">
           <Info className="w-4 h-4 mt-0.5 shrink-0" />
           <span>{t('reserves.disclaimer')}</span>
         </div>

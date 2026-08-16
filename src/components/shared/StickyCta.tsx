@@ -57,7 +57,7 @@ export function StickyCta() {
         <button
           type="button"
           onClick={() => scrollTo("eligibility")}
-          className="shrink-0 px-4 py-1.5 text-sm font-medium rounded-full bg-surface text-primary hover:bg-ivory-100 transition-colors"
+          className="shrink-0 px-3 py-1 text-[11px] sm:px-4 sm:py-1.5 sm:text-sm font-medium rounded-full bg-surface text-primary hover:bg-ivory-100 transition-colors"
         >
           {t("hero.cta" as never)}
         </button>

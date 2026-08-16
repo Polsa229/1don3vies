@@ -1,5 +1,5 @@
 /**
- * Données statiques des centres de don de sang — HemoLink
+ * Données statiques des centres de don de sang — 1Don3Vies
  *
  * Référence de structure (pour extension future, ex. mode "France") :
  * API Carto v3 de l'Établissement Français du Sang (EFS)

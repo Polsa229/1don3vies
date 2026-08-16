@@ -12,11 +12,11 @@ interface CountUpOptions {
 /**
  * Counts from 0 to `to` once when the element enters the viewport.
  */
-export function useCountUp(
+export function useCountUp<T extends HTMLElement = HTMLDivElement>(
   to: number,
   { duration = 1.5, delay = 0, amount = 0.45 }: CountUpOptions = {},
 ) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<T>(null);
   const inView = useInView(ref, { once: true, amount });
   const [value, setValue] = useState(0);
 

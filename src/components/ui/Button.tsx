@@ -13,7 +13,7 @@ const variantClasses: Record<Variant, string> = {
   primary:
     'bg-primary text-white hover:bg-primary-dark active:bg-primary-900 shadow-lg shadow-primary/20',
   secondary:
-    'bg-accent text-white hover:bg-accent-600 active:bg-accent-700 shadow-md shadow-accent/25',
+    'bg-accent-700 text-white hover:bg-accent-800 active:bg-accent-900 shadow-md shadow-accent/25',
   ghost:
     'bg-transparent text-primary hover:bg-primary-50 active:bg-primary-100',
   outline:
@@ -21,9 +21,9 @@ const variantClasses: Record<Variant, string> = {
 };
 
 const sizeClasses: Record<Size, string> = {
-  sm: 'px-4 py-2 text-sm',
-  md: 'px-6 py-3 text-base',
-  lg: 'px-8 py-4 text-lg',
+  sm: 'px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm',
+  md: 'px-4 py-2 text-sm sm:px-6 sm:py-3 sm:text-base',
+  lg: 'px-6 py-3 text-base sm:px-8 sm:py-4 sm:text-lg',
 };
 
 export function Button({

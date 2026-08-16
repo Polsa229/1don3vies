@@ -19,14 +19,14 @@ export function SectionHeading({
 
   return (
     <div
-      className={`mb-12 ${center ? "text-center mx-auto max-w-2xl" : "max-w-2xl"} ${className}`}
+      className={`mb-6 lg:mb-12 ${center ? "text-center mx-auto max-w-2xl" : "max-w-2xl"} ${className}`}
     >
       <p className="eyebrow mb-3">{t(eyebrowKey as never)}</p>
-      <h2 className="heading-display text-3xl sm:text-4xl lg:text-5xl leading-[1.15] text-balance">
+      <h2 className="heading-display text-2xl sm:text-4xl lg:text-5xl leading-[1.15] text-balance">
         {t(titleKey as never)}
       </h2>
       {subtitleKey && (
-        <p className="mt-4 text-warmgray-600 text-base sm:text-lg leading-relaxed">
+        <p className="mt-2 sm:mt-4 text-warmgray-600 text-sm sm:text-lg leading-relaxed">
           {t(subtitleKey as never)}
         </p>
       )}
@@ -36,18 +36,19 @@ export function SectionHeading({
 
 interface QuoteBlockProps {
   quoteKey: string;
+  className?: string;
 }
 
-export function QuoteBlock({ quoteKey }: QuoteBlockProps) {
+export function QuoteBlock({ quoteKey, className = "" }: QuoteBlockProps) {
   const { t } = useI18n();
 
   return (
-    <div className="relative py-16 sm:py-20 overflow-hidden">
+    <div className={`relative py-4 sm:py-10 overflow-hidden ${className}`}>
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div className="w-full max-w-3xl h-px bg-gradient-to-r from-transparent via-primary-300 to-transparent" />
       </div>
-      <blockquote className="relative text-center px-6">
-        <p className="heading-display text-2xl sm:text-3xl lg:text-4xl text-primary-800 italic leading-relaxed text-balance">
+      <blockquote className="relative text-center px-4 sm:px-6">
+        <p className="heading-display text-[12px] sm:text-3xl lg:text-4xl text-primary-800 italic leading-none whitespace-nowrap tracking-tight">
           &ldquo;{t(quoteKey as never)}&rdquo;
         </p>
       </blockquote>

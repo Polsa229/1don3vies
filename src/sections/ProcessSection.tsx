@@ -49,6 +49,11 @@ const TIPS = [
     itemsKey: 'process.tips.before.items',
   },
   {
+    icon: ClipboardCheck,
+    titleKey: 'process.tips.day',
+    itemsKey: 'process.tips.day.items',
+  },
+  {
     icon: Shield,
     titleKey: 'process.tips.during',
     itemsKey: 'process.tips.during.items',
@@ -67,7 +72,7 @@ export function ProcessSection() {
   return (
     <section
       id="process"
-      className="relative py-24 lg:py-32 bg-ivory-100 overflow-hidden"
+      className="relative py-8 lg:py-24 bg-ivory-100 overflow-hidden"
     >
       <InkBlot
         variant={3}
@@ -130,7 +135,7 @@ export function ProcessSection() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 sm:gap-8 lg:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-6">
             {STEPS.map((step, i) => {
               const Icon = step.icon;
               const filled = hovered !== null && i <= hovered;
@@ -206,7 +211,7 @@ export function ProcessSection() {
                     <span
                       className={`absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold shadow-md transition-colors duration-300 ${
                         filled
-                          ? 'bg-accent-500 text-white'
+                          ? 'bg-accent-700 text-white'
                           : 'bg-primary-700 text-ivory-50'
                       }`}
                     >
@@ -243,7 +248,7 @@ export function ProcessSection() {
         </motion.div>
 
         <motion.div
-          className="mt-12 text-center"
+          className="mt-8 lg:mt-12 text-center"
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={viewportOnce}
@@ -255,12 +260,12 @@ export function ProcessSection() {
           </span>
         </motion.div>
 
-        <div className="mt-20">
-          <h3 className="font-display text-2xl text-primary-900 text-center mb-10">
+        <div className="mt-10 lg:mt-20">
+          <h3 className="font-display text-xl lg:text-2xl text-primary-900 text-center mb-5 lg:mb-10">
             {t('process.tips.title')}
           </h3>
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6"
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
@@ -273,15 +278,15 @@ export function ProcessSection() {
                   key={tip.titleKey}
                   variants={fadeUp}
                   whileHover={{ y: -4 }}
-                  className="bg-white rounded-2xl p-7 border border-warmgray-200/50 shadow-sm hover:shadow-md transition-shadow"
+                  className="bg-white rounded-2xl p-4 lg:p-7 border border-warmgray-200/50 shadow-sm hover:shadow-md transition-shadow"
                 >
-                  <div className="w-11 h-11 rounded-xl bg-primary-50 flex items-center justify-center mb-4">
-                    <Icon className="w-5 h-5 text-primary-600" />
+                  <div className="w-9 h-9 lg:w-11 lg:h-11 rounded-xl bg-primary-50 flex items-center justify-center mb-3 lg:mb-4">
+                    <Icon className="w-4 h-4 lg:w-5 lg:h-5 text-primary-600" />
                   </div>
-                  <h4 className="font-display text-lg text-primary-900 mb-3">
+                  <h4 className="font-display text-sm lg:text-lg text-primary-900 mb-2 lg:mb-3">
                     {t(tip.titleKey)}
                   </h4>
-                  <p className="text-sm text-warmgray-600 leading-relaxed">
+                  <p className="text-xs lg:text-sm text-warmgray-600 leading-relaxed">
                     {t(tip.itemsKey)}
                   </p>
                 </motion.div>

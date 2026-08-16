@@ -1,7 +1,7 @@
 import type { EligibilityInput, EligibilityResult } from './eligibility.types';
 
-const MIN_AGE = 18;
-const MAX_AGE = 65;
+export const MIN_AGE = 18;
+export const MAX_AGE = 65;
 const MIN_WEIGHT = 50;
 const MALE_DELAY_MONTHS = 3;
 const FEMALE_DELAY_MONTHS = 4;
@@ -31,8 +31,8 @@ export function checkEligibility(input: EligibilityInput, lang: 'fr' | 'en' = 'f
       status: 'ineligible',
       message:
         lang === 'fr'
-          ? 'Ce critère semble actuellement bloquant : l\'âge (entre 18 et 65 ans révolus).'
-          : 'This criterion currently seems blocking: age (between 18 and 65 full years).',
+          ? 'L\'âge est un critère bloquant : il faut avoir entre 18 et 65 ans révolus.'
+          : 'Age is a blocking criterion: you must be between 18 and 65 full years old.',
       blockingCriterion: 'age',
     };
   }

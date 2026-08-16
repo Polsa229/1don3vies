@@ -50,9 +50,9 @@ function InlineCount({
   const { ref, value } = useCountUp(to, { duration: 1.2, delay });
 
   return (
-    <div ref={ref} className="inline-block font-bold text-primary-700 tabular-nums">
+    <span ref={ref} className="inline-block font-bold text-primary-700 tabular-nums">
       {formatCount(value, lang)}
-    </div>
+    </span>
   );
 }
 
@@ -76,7 +76,7 @@ export function WhyDonateSection() {
   }, [videoOpen]);
 
   return (
-    <section id="why" className="relative py-24 lg:py-32 overflow-hidden">
+    <section id="why" className="relative py-8 lg:py-24 overflow-hidden">
       <InkBlot
         variant={1}
         color="#6B1F35"
@@ -92,7 +92,7 @@ export function WhyDonateSection() {
 
         {/* Stats */}
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 lg:mb-12"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
@@ -106,7 +106,7 @@ export function WhyDonateSection() {
               <Heart className="w-6 h-6 text-primary-600" fill="currentColor" />
             </div>
             <StatNumber to={1} lang={lang} delay={0.05} />
-            <p className="text-sm text-warmgray-500 mt-1">
+            <p className="text-sm text-warmgray-600 mt-1">
               {t("why.stats.donations")} <InlineCount to={3} lang={lang} />{" "}
               {t("why.stats.lives")}
             </p>
@@ -119,7 +119,7 @@ export function WhyDonateSection() {
               <Activity className="w-6 h-6 text-accent-600" />
             </div>
             <StatNumber to={10000} lang={lang} delay={0.12} />
-            <p className="text-sm text-warmgray-500 mt-1">
+            <p className="text-sm text-warmgray-600 mt-1">
               {t("why.stats.daily")}
             </p>
           </motion.div>
@@ -131,7 +131,7 @@ export function WhyDonateSection() {
               <Users className="w-6 h-6 text-success-600" />
             </div>
             <StatNumber to={100} lang={lang} suffix="%" delay={0.2} />
-            <p className="text-sm text-warmgray-500 mt-1">
+            <p className="text-sm text-warmgray-600 mt-1">
               {lang === "fr"
                 ? "Sécurité du matériel à usage unique"
                 : "Single-use equipment safety"}
@@ -140,7 +140,7 @@ export function WhyDonateSection() {
         </motion.div>
 
         {/* Body text */}
-        <div className="max-w-2xl mx-auto text-center mb-12">
+        <div className="max-w-2xl mx-auto text-center mb-6 lg:mb-12">
           <p className="text-base sm:text-lg text-warmgray-600 leading-relaxed">
             {t("why.body")}
           </p>
@@ -214,7 +214,11 @@ export function WhyDonateSection() {
             <motion.div
               role="dialog"
               aria-modal="true"
-              aria-label="Pourquoi la diversité des donneurs de sang est cruciale"
+              aria-label={
+                lang === "fr"
+                  ? "Pourquoi la diversité des donneurs de sang est cruciale"
+                  : "Why blood donor diversity is crucial"
+              }
               className="relative w-full max-w-4xl aspect-video rounded-2xl overflow-hidden shadow-2xl bg-primary-950"
               initial={{ opacity: 0, scale: 0.96, y: 12 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}

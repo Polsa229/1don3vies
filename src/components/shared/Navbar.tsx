@@ -13,14 +13,16 @@ const NAV_ITEMS = [
   { id: "reserves", key: "nav.reserves" },
   { id: "why", key: "nav.why" },
   { id: "faq", key: "nav.faq" },
-];
+] as const;
+
+const NAV_IDS = NAV_ITEMS.map((n) => n.id);
 
 export function Navbar() {
   const { t } = useI18n();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const activeSection = useScrollSpy(NAV_ITEMS.map((n) => n.id));
+  const activeSection = useScrollSpy(NAV_IDS);
   const onCentresPage = location.pathname === "/centres";
 
   function handleHome() {
@@ -40,13 +42,13 @@ export function Navbar() {
           type="button"
           onClick={handleHome}
           className="flex items-center gap-2.5 group"
-          aria-label="HemoLink — Home"
+          aria-label={t("nav.home.label" as never)}
         >
           <span className="relative flex items-center justify-center w-9 h-9 rounded-full bg-primary transition-transform group-hover:scale-105">
             <Droplet className="w-5 h-5 text-white" fill="currentColor" />
           </span>
           <span className="font-display text-xl font-medium text-primary-900">
-            HemoLink
+            1Don3Vies
           </span>
         </button>
 
@@ -74,7 +76,9 @@ export function Navbar() {
             type="button"
             className="lg:hidden p-2 rounded-full hover:bg-warmgray-100 transition-colors"
             onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-label={t(
+              (mobileOpen ? "nav.menu.close" : "nav.menu.open") as never,
+            )}
             aria-expanded={mobileOpen}
           >
             {mobileOpen ? (

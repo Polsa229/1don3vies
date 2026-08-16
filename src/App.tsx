@@ -1,46 +1,74 @@
-import { useEffect, useState, lazy, Suspense, useCallback } from 'react';
-import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
-import { I18nProvider } from '@/i18n/I18nContext';
-import { Navbar } from '@/components/shared/Navbar';
-import { StickyCta } from '@/components/shared/StickyCta';
-import { Hero } from '@/sections/Hero';
-import { EligibilitySimulator } from '@/sections/EligibilitySimulator';
-import { QuoteBlock } from '@/components/shared/SectionHeading';
-import { LoadingScreen } from '@/components/shared/LoadingScreen';
-import { Footer } from '@/sections/Footer';
-import { MobileBottomNav } from '@/components/shared/MobileBottomNav';
+import { useEffect, useState, lazy, Suspense, useCallback } from "react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+import { I18nProvider } from "@/i18n/I18nContext";
+import { Navbar } from "@/components/shared/Navbar";
+import { StickyCta } from "@/components/shared/StickyCta";
+import { Hero } from "@/sections/Hero";
+import { QuoteBlock } from "@/components/shared/SectionHeading";
+import { LoadingScreen } from "@/components/shared/LoadingScreen";
+import { Footer } from "@/sections/Footer";
+import { MobileBottomNav } from "@/components/shared/MobileBottomNav";
 
+const EligibilitySimulator = lazy(() =>
+  import("@/sections/EligibilitySimulator").then((m) => ({
+    default: m.EligibilitySimulator,
+  })),
+);
 const ProcessSection = lazy(() =>
-  import('@/sections/ProcessSection').then((m) => ({ default: m.ProcessSection })),
+  import("@/sections/ProcessSection").then((m) => ({
+    default: m.ProcessSection,
+  })),
 );
 const CentersSection = lazy(() =>
-  import('@/sections/CentersSection').then((m) => ({ default: m.CentersSection })),
+  import("@/sections/CentersSection").then((m) => ({
+    default: m.CentersSection,
+  })),
 );
 const ReservesSection = lazy(() =>
-  import('@/sections/ReservesSection').then((m) => ({ default: m.ReservesSection })),
+  import("@/sections/ReservesSection").then((m) => ({
+    default: m.ReservesSection,
+  })),
 );
 const WhyDonateSection = lazy(() =>
-  import('@/sections/WhyDonateSection').then((m) => ({ default: m.WhyDonateSection })),
+  import("@/sections/WhyDonateSection").then((m) => ({
+    default: m.WhyDonateSection,
+  })),
 );
 const FaqSection = lazy(() =>
-  import('@/sections/FaqSection').then((m) => ({ default: m.FaqSection })),
+  import("@/sections/FaqSection").then((m) => ({ default: m.FaqSection })),
 );
 const CentersPage = lazy(() =>
-  import('@/pages/CentersPage').then((m) => ({ default: m.CentersPage })),
+  import("@/pages/CentersPage").then((m) => ({ default: m.CentersPage })),
 );
 const BackToTop = lazy(() =>
-  import('@/components/shared/BackToTop').then((m) => ({ default: m.BackToTop })),
+  import("@/components/shared/BackToTop").then((m) => ({
+    default: m.BackToTop,
+  })),
 );
 const ChatWidget = lazy(() =>
-  import('@/components/shared/ChatWidget').then((m) => ({ default: m.ChatWidget })),
+  import("@/components/shared/ChatWidget").then((m) => ({
+    default: m.ChatWidget,
+  })),
 );
+
+function prefetchLandingChunks() {
+  void import("@/sections/EligibilitySimulator");
+  void import("@/sections/ProcessSection");
+  void import("@/sections/CentersSection");
+}
 
 function LandingPage() {
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const id = location.hash.replace(/^#/, '');
+    const id = location.hash.replace(/^#/, "");
     if (!id) return;
 
     let cancelled = false;
@@ -49,7 +77,7 @@ function LandingPage() {
 
     function finish() {
       // Une fois sur l'accueil, garder une URL propre : /
-      navigate('/', { replace: true });
+      navigate("/", { replace: true });
     }
 
     function tryScroll() {
@@ -57,7 +85,7 @@ function LandingPage() {
 
       const el = document.getElementById(id);
       if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
         finish();
         return;
       }
@@ -85,7 +113,9 @@ function LandingPage() {
       <StickyCta />
       <main>
         <Hero />
-        <EligibilitySimulator />
+        <Suspense fallback={<div className="min-h-[50vh]" aria-hidden />}>
+          <EligibilitySimulator />
+        </Suspense>
         <QuoteBlock quoteKey="quote.1" />
         <Suspense fallback={null}>
           <ProcessSection />
@@ -102,41 +132,70 @@ function LandingPage() {
 function App() {
   const [loading, setLoading] = useState(() => {
     try {
-      return !sessionStorage.getItem('hemolink-intro-seen');
+      return !sessionStorage.getItem("1Don3Vies-intro-seen");
     } catch {
       return true;
     }
   });
+  const [widgetsReady, setWidgetsReady] = useState(false);
+
+  useEffect(() => {
+    prefetchLandingChunks();
+  }, []);
+
+  useEffect(() => {
+    if (loading) return;
+
+    const idle = window.requestIdleCallback;
+    const id = idle
+      ? idle(() => setWidgetsReady(true), { timeout: 2000 })
+      : window.setTimeout(() => setWidgetsReady(true), 600);
+
+    return () => {
+      if (idle) window.cancelIdleCallback(id);
+      else window.clearTimeout(id);
+    };
+  }, [loading]);
 
   const handleLoadingComplete = useCallback(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    try {
+      sessionStorage.setItem("1Don3Vies-intro-seen", "1");
+    } catch {
+      /* ignore */
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
     setLoading(false);
   }, []);
 
   return (
     <I18nProvider>
-      {loading && <LoadingScreen onComplete={handleLoadingComplete} />}
       <BrowserRouter>
-        <div className={`min-h-screen bg-background pb-16 lg:pb-0 ${loading ? 'overflow-hidden h-screen' : ''}`}>
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route
-              path="/centres"
-              element={
-                <Suspense fallback={null}>
-                  <CentersPage />
-                </Suspense>
-              }
-            />
-          </Routes>
-          <Footer />
-          <MobileBottomNav />
-          <Suspense fallback={null}>
-            <BackToTop />
-            <ChatWidget />
-          </Suspense>
-        </div>
+        {loading ? (
+          <LoadingScreen onComplete={handleLoadingComplete} />
+        ) : (
+          <div className="min-h-screen bg-background pb-16 lg:pb-0">
+            <Navbar />
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route
+                path="/centres"
+                element={
+                  <Suspense fallback={null}>
+                    <CentersPage />
+                  </Suspense>
+                }
+              />
+            </Routes>
+            <Footer />
+            <MobileBottomNav />
+            {widgetsReady && (
+              <Suspense fallback={null}>
+                <BackToTop />
+                <ChatWidget />
+              </Suspense>
+            )}
+          </div>
+        )}
       </BrowserRouter>
     </I18nProvider>
   );

@@ -2,33 +2,33 @@ import { useState } from "react";
 import { useI18n } from "@/i18n/useI18n";
 import { SectionHeading, QuoteBlock } from "@/components/shared/SectionHeading";
 import { InkBlot } from "@/components/shared/InkBlot";
+import { DonationCriteriaPanel } from "@/components/shared/DonationCriteriaPanel";
+import { Button } from "@/components/ui/Button";
 import { faqItems, quoteKeys } from "@/data/faq.data";
-import {
-  ChevronDown,
-  UserCheck,
-  Weight,
-  Clock,
-  ShieldCheck,
-  IdCard,
-} from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { fadeUp, staggerContainer, viewportOnce } from "@/lib/motion";
-
-const criteriaKeys = [
-  { icon: UserCheck, key: "faq.criteria.age" },
-  { icon: Weight, key: "faq.criteria.weight" },
-  { icon: Clock, key: "faq.criteria.delay.male" },
-  { icon: Clock, key: "faq.criteria.delay.female" },
-  { icon: ShieldCheck, key: "faq.criteria.health" },
-  { icon: IdCard, key: "faq.criteria.id" },
-];
 
 export function FaqSection() {
   const { t } = useI18n();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [contact, setContact] = useState("");
+  const [message, setMessage] = useState("");
+  const [sent, setSent] = useState(false);
+  const [formError, setFormError] = useState(false);
+
+  function handleConcernSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!contact.trim() || !message.trim()) {
+      setFormError(true);
+      return;
+    }
+    setFormError(false);
+    setSent(true);
+  }
 
   return (
-    <section id="faq" className="relative py-24 lg:py-32 overflow-hidden">
+    <section id="faq" className="relative py-8 lg:py-24 overflow-hidden">
       <InkBlot
         variant={2}
         color="#691735"
@@ -42,45 +42,13 @@ export function FaqSection() {
           subtitleKey="faq.subtitle"
         />
 
-        {/* Criteria summary */}
-        <div className="max-w-3xl mx-auto mb-16">
-          <div className="bg-white rounded-3xl border border-warmgray-200/50 shadow-lg shadow-primary-900/5 p-6 sm:p-8">
-            <h3 className="font-display text-xl text-primary-900 mb-5 text-center">
-              {t("faq.criteria.title")}
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {criteriaKeys.map((item, i) => {
-                const Icon = item.icon;
-                return (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={viewportOnce}
-                    transition={{ delay: i * 0.05, duration: 0.35 }}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl bg-ivory-50"
-                  >
-                    <div className="shrink-0 w-9 h-9 rounded-lg bg-primary-50 flex items-center justify-center">
-                      <Icon className="w-4 h-4 text-primary-600" />
-                    </div>
-                    <span className="text-sm text-warmgray-700 leading-snug">
-                      {t(item.key as never)}
-                    </span>
-                  </motion.div>
-                );
-              })}
-            </div>
-            <p className="mt-5 text-center text-xs text-warmgray-500 italic">
-              {t("faq.criteria.disclaimer")}
-            </p>
-          </div>
-        </div>
+        <DonationCriteriaPanel />
 
         {/* Quote separator */}
         <QuoteBlock quoteKey={quoteKeys[2]} />
 
-        {/* FAQ accordion */}
-        <div className="max-w-2xl mx-auto">
+        {/* FAQ accordion + concern form */}
+        <div className="max-w-2xl mx-auto lg:max-w-none grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-8 items-start">
           <motion.div
             className="space-y-3"
             variants={staggerContainer}
@@ -104,10 +72,10 @@ export function FaqSection() {
                     type="button"
                     onClick={() => setOpenIndex(isOpen ? null : i)}
                     aria-expanded={isOpen}
-                    className="w-full flex items-center justify-between gap-4 px-5 sm:px-6 py-5 text-left"
+                    className="w-full flex items-center justify-between gap-3 px-4 sm:px-6 py-4 sm:py-5 text-left"
                   >
                     <span
-                      className={`font-display text-base sm:text-lg transition-colors ${isOpen ? "text-primary-800" : "text-primary-900"}`}
+                      className={`font-display text-sm sm:text-lg transition-colors ${isOpen ? "text-primary-800" : "text-primary-900"}`}
                     >
                       {t(item.qKey as never)}
                     </span>
@@ -117,7 +85,7 @@ export function FaqSection() {
                       className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
                         isOpen
                           ? "bg-primary-700 text-ivory-50"
-                          : "bg-ivory-100 text-warmgray-500"
+                          : "bg-ivory-100 text-warmgray-600"
                       }`}
                     >
                       <ChevronDown className="w-4 h-4" />
@@ -146,6 +114,82 @@ export function FaqSection() {
               );
             })}
           </motion.div>
+
+          <form
+            onSubmit={handleConcernSubmit}
+            className="bg-white rounded-2xl border border-warmgray-200/50 shadow-sm p-5 sm:p-6 lg:sticky lg:top-24"
+          >
+            <h3 className="font-display text-base sm:text-xl text-primary-900 mb-1">
+              {t("faq.more.title")}
+            </h3>
+            <p className="text-xs sm:text-sm text-warmgray-600 mb-4">
+              {t("faq.more.subtitle")}
+            </p>
+
+            {sent ? (
+              <p
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+                className="text-sm text-success-700 bg-success-50 border border-success-200 rounded-xl px-4 py-3"
+              >
+                {t("faq.more.success")}
+              </p>
+            ) : (
+              <div className="space-y-3">
+                <div>
+                  <label
+                    htmlFor="faq-contact"
+                    className="block text-sm font-medium text-primary-900 mb-1.5"
+                  >
+                    {t("faq.more.contact")}
+                  </label>
+                  <input
+                    id="faq-contact"
+                    type="text"
+                    autoComplete="email"
+                    value={contact}
+                    onChange={(e) => setContact(e.target.value)}
+                    placeholder={t("faq.more.contact.placeholder")}
+                    aria-invalid={formError && !contact.trim()}
+                    className="w-full px-4 py-2.5 text-sm text-primary-900 bg-ivory-50 border border-warmgray-200 rounded-2xl focus:border-primary-400 transition-colors outline-none"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="faq-message"
+                    className="block text-sm font-medium text-primary-900 mb-1.5"
+                  >
+                    {t("faq.more.message")}
+                  </label>
+                  <textarea
+                    id="faq-message"
+                    rows={4}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder={t("faq.more.message.placeholder")}
+                    aria-invalid={formError && !message.trim()}
+                    className="w-full px-4 py-2.5 text-sm text-primary-900 bg-ivory-50 border border-warmgray-200 rounded-2xl focus:border-primary-400 transition-colors outline-none resize-none"
+                  />
+                </div>
+                {formError && (
+                  <p
+                    role="alert"
+                    aria-live="assertive"
+                    aria-atomic="true"
+                    className="text-sm text-error-700"
+                  >
+                    {t("faq.more.error")}
+                  </p>
+                )}
+                <div className="flex justify-end">
+                  <Button type="submit" size="sm">
+                    {t("faq.more.submit")}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </form>
         </div>
       </div>
     </section>

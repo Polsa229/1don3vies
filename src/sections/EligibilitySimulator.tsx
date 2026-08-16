@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useI18n } from "@/i18n/useI18n";
-import { checkEligibility } from "@/features/eligibility/eligibility.logic";
+import {
+  checkEligibility,
+  MAX_AGE,
+  MIN_AGE,
+} from "@/features/eligibility/eligibility.logic";
 import type {
   EligibilityInput,
   EligibilityResult,
@@ -11,7 +15,6 @@ import { InkBlot } from "@/components/shared/InkBlot";
 import { Button } from "@/components/ui/Button";
 import {
   ArrowRight,
-  ArrowLeft,
   RotateCcw,
   Check,
   X,
@@ -19,11 +22,18 @@ import {
   AlertCircle,
 } from "lucide-react";
 
-const TOTAL_STEPS = 5;
+const choiceBtn = (active: boolean) =>
+  `px-4 py-3 rounded-2xl text-sm font-semibold border transition-all duration-200 ${
+    active
+      ? "border-primary-500 bg-primary-50 text-primary-700 shadow-sm"
+      : "border-warmgray-200 bg-ivory-50 text-warmgray-600 hover:border-primary-300"
+  }`;
+
+const fieldInput =
+  "w-full px-4 py-2.5 text-xl font-display text-primary-900 bg-ivory-50 border border-warmgray-200 rounded-2xl focus:border-primary-400 transition-colors outline-none";
 
 export function EligibilitySimulator() {
   const { t, lang } = useI18n();
-  const [step, setStep] = useState(0); // 0-4 for questions, 5 for result
   const [age, setAge] = useState("");
   const [gender, setGender] = useState<Gender | null>(null);
   const [weight, setWeight] = useState("");
@@ -31,71 +41,50 @@ export function EligibilitySimulator() {
     null,
   );
   const [lastDonationDate, setLastDonationDate] = useState("");
+  const [showLastDate, setShowLastDate] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<EligibilityResult | null>(null);
 
-  function validateCurrentStep(): boolean {
+  function isAgeBlocking() {
+    const ageNum = Number(age);
+    return (
+      Boolean(age) && !isNaN(ageNum) && (ageNum < MIN_AGE || ageNum > MAX_AGE)
+    );
+  }
+
+  function validateForm(): boolean {
     setError("");
-    switch (step) {
-      case 0:
-        if (!age || isNaN(Number(age))) {
-          setError(t("eligibility.error.ageRequired"));
-          return false;
-        }
-        return true;
-      case 1:
-        if (gender === null) {
-          setError(t("eligibility.error.ageRequired"));
-          return false;
-        }
-        return true;
-      case 2:
-        if (!weight || isNaN(Number(weight))) {
-          setError(t("eligibility.error.weightRequired"));
-          return false;
-        }
-        return true;
-      case 3:
-        if (hasDonatedBefore === null) {
-          setError(t("eligibility.error.ageRequired"));
-          return false;
-        }
-        return true;
-      case 4:
-        if (hasDonatedBefore && !lastDonationDate) {
-          setError(t("eligibility.error.dateRequired"));
-          return false;
-        }
-        if (hasDonatedBefore && new Date(lastDonationDate) > new Date()) {
-          setError(t("eligibility.error.dateFuture"));
-          return false;
-        }
-        return true;
-      default:
-        return true;
+    if (!age || isNaN(Number(age))) {
+      setError(t("eligibility.error.ageRequired"));
+      return false;
     }
+    if (isAgeBlocking()) return true;
+    if (gender === null) {
+      setError(t("eligibility.error.genderRequired"));
+      return false;
+    }
+    if (!weight || isNaN(Number(weight))) {
+      setError(t("eligibility.error.weightRequired"));
+      return false;
+    }
+    if (hasDonatedBefore === null) {
+      setError(t("eligibility.error.prevDonationRequired"));
+      return false;
+    }
+    if (hasDonatedBefore && !lastDonationDate) {
+      setShowLastDate(true);
+      setError(t("eligibility.error.dateRequired"));
+      return false;
+    }
+    if (hasDonatedBefore && new Date(lastDonationDate) > new Date()) {
+      setError(t("eligibility.error.dateFuture"));
+      return false;
+    }
+    return true;
   }
 
-  function handleNext() {
-    if (!validateCurrentStep()) return;
-
-    if (step === 3 && hasDonatedBefore === false) {
-      // Skip date step, go straight to result
-      computeResult();
-      setStep(5);
-      return;
-    }
-
-    if (step === 4) {
-      computeResult();
-      setStep(5);
-      return;
-    }
-
-    setStep((s) => s + 1);
-  }
-
-  function computeResult() {
+  function handleSubmit() {
+    if (!validateForm()) return;
     const input: EligibilityInput = {
       age: Number(age),
       gender,
@@ -106,26 +95,13 @@ export function EligibilitySimulator() {
     setResult(checkEligibility(input, lang));
   }
 
-  function handleBack() {
-    setError("");
-    if (step === 5) {
-      setStep(hasDonatedBefore ? 4 : 3);
-      return;
-    }
-    if (step === 3 && hasDonatedBefore === false) {
-      setStep(2);
-      return;
-    }
-    setStep((s) => Math.max(0, s - 1));
-  }
-
   function handleRestart() {
-    setStep(0);
     setAge("");
     setGender(null);
     setWeight("");
     setHasDonatedBefore(null);
     setLastDonationDate("");
+    setShowLastDate(false);
     setError("");
     setResult(null);
   }
@@ -135,20 +111,12 @@ export function EligibilitySimulator() {
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  const isResultStep = step === 5;
-  const progress = isResultStep ? 100 : (step / TOTAL_STEPS) * 100;
-  const stepLabels = [
-    t("eligibility.age"),
-    t("eligibility.gender"),
-    t("eligibility.weight"),
-    t("eligibility.prevDonation"),
-    t("eligibility.lastDonationDate"),
-  ];
+  const showResult = Boolean(result);
 
   return (
     <section
       id="eligibility"
-      className="relative py-12 lg:py-16 overflow-hidden"
+      className="relative pt-2 pb-8 lg:pt-6 lg:pb-16 overflow-hidden"
     >
       <InkBlot
         variant={2}
@@ -161,132 +129,24 @@ export function EligibilitySimulator() {
           eyebrowKey="eligibility.eyebrow"
           titleKey="eligibility.title"
           subtitleKey="eligibility.subtitle"
-          className="!mb-6 sm:!mb-8"
+          className="!mb-4 sm:!mb-5"
         />
 
-        <div className="max-w-4xl mx-auto">
-          {/* Step tracker */}
-          {!isResultStep && (
-            <div className="mb-5 sm:mb-6">
-                      <div className="flex items-center justify-between gap-1.5 sm:gap-2 mb-3">
-                {Array.from({ length: TOTAL_STEPS }, (_, i) => {
-                  const done = i < step;
-                  const current = i === step;
-                  return (
-                    <div
-                      key={i}
-                      className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1"
+        <div className="max-w-2xl mx-auto">
+          <div id="simulator-form" className="scroll-mt-24">
+            {!showResult && (
+              <div className="bg-surface rounded-2xl shadow-lg shadow-primary-900/[0.04] border border-warmgray-200/70 p-4 sm:p-5">
+                <div className="flex-1 space-y-4">
+                  <div>
+                    <label
+                      htmlFor="age-input"
+                      className="block text-base sm:text-lg font-display text-primary-900 mb-1"
                     >
-                      <div
-                        className={`shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold border transition-colors ${
-                          done
-                            ? "bg-primary text-white border-primary"
-                            : current
-                              ? "bg-primary-50 text-primary-800 border-primary-400"
-                              : "bg-ivory-50 text-warmgray-400 border-warmgray-200"
-                        }`}
-                      >
-                        {done ? <Check className="w-3.5 h-3.5" /> : i + 1}
-                      </div>
-                      <span
-                        className={`hidden md:block text-xs font-medium whitespace-nowrap ${
-                          current ? "text-primary-800" : "text-warmgray-400"
-                        }`}
-                      >
-                        {stepLabels[i] ?? `Étape ${i + 1}`}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-medium text-warmgray-500">
-                  {t("eligibility.step")} {step + 1} {t("eligibility.of")}{" "}
-                  {TOTAL_STEPS}
-                </span>
-                <span className="text-xs font-semibold text-primary-600 tabular-nums">
-                  {Math.round(progress)}%
-                </span>
-              </div>
-              <div className="h-1.5 bg-warmgray-100 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-primary-600 to-accent-500 rounded-full transition-all duration-500 ease-out"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Question steps */}
-          {!isResultStep && (
-            <div className="bg-surface rounded-2xl shadow-lg shadow-primary-900/[0.04] border border-warmgray-200/70 p-5 sm:p-7">
-              <div className="lg:grid lg:grid-cols-[1.1fr_1fr] lg:gap-10 lg:items-start">
-                {/* Left: question copy */}
-                <div className="mb-5 lg:mb-0">
-                  {step === 0 && (
-                    <div className="animate-fade-in">
-                      <label
-                        htmlFor="age-input"
-                        className="block text-2xl font-display text-primary-900 mb-2"
-                      >
-                        {t("eligibility.age")}
-                      </label>
-                      <p className="text-sm text-warmgray-500 leading-relaxed">
-                        {t("eligibility.age.hint")}
-                      </p>
-                    </div>
-                  )}
-                  {step === 1 && (
-                    <div className="animate-fade-in">
-                      <p className="block text-2xl font-display text-primary-900 mb-2">
-                        {t("eligibility.gender")}
-                      </p>
-                      <p className="text-sm text-warmgray-500 leading-relaxed">
-                        {t("eligibility.gender.hint")}
-                      </p>
-                    </div>
-                  )}
-                  {step === 2 && (
-                    <div className="animate-fade-in">
-                      <label
-                        htmlFor="weight-input"
-                        className="block text-2xl font-display text-primary-900 mb-2"
-                      >
-                        {t("eligibility.weight")}
-                      </label>
-                      <p className="text-sm text-warmgray-500 leading-relaxed">
-                        {t("eligibility.weight.hint")}
-                      </p>
-                    </div>
-                  )}
-                  {step === 3 && (
-                    <div className="animate-fade-in">
-                      <p className="block text-2xl font-display text-primary-900 mb-2">
-                        {t("eligibility.prevDonation")}
-                      </p>
-                      <p className="text-sm text-warmgray-500 leading-relaxed">
-                        {t("eligibility.prevDonation.hint")}
-                      </p>
-                    </div>
-                  )}
-                  {step === 4 && (
-                    <div className="animate-fade-in">
-                      <label
-                        htmlFor="date-input"
-                        className="block text-2xl font-display text-primary-900 mb-2"
-                      >
-                        {t("eligibility.lastDonationDate")}
-                      </label>
-                      <p className="text-sm text-warmgray-500 leading-relaxed">
-                        {t("eligibility.lastDonationDate.hint")}
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Right: controls */}
-                <div className="animate-fade-in">
-                  {step === 0 && (
+                      {t("eligibility.age")}
+                    </label>
+                    <p className="text-xs text-warmgray-600 leading-relaxed mb-2">
+                      {t("eligibility.age.hint")}
+                    </p>
                     <input
                       id="age-input"
                       type="number"
@@ -295,24 +155,27 @@ export function EligibilitySimulator() {
                       max={120}
                       value={age}
                       onChange={(e) => setAge(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleNext()}
+                      onFocus={() => setShowLastDate(false)}
+                      onClick={() => setShowLastDate(false)}
+                      onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
                       placeholder="—"
-                      className="w-full px-5 py-4 text-2xl font-display text-primary-900 bg-ivory-50 border border-warmgray-200 rounded-2xl focus:border-primary-400 transition-colors outline-none"
+                      className={fieldInput}
                     />
-                  )}
-
-                  {step === 1 && (
-                    <div className="grid grid-cols-2 gap-3">
+                  </div>
+                  <div>
+                    <p className="block text-base sm:text-lg font-display text-primary-900 mb-1">
+                      {t("eligibility.gender")}
+                    </p>
+                    <p className="text-xs text-warmgray-600 leading-relaxed mb-2">
+                      {t("eligibility.gender.hint")}
+                    </p>
+                    <div className="grid grid-cols-2 gap-2.5">
                       {(["male", "female"] as const).map((g) => (
                         <button
                           key={g}
                           type="button"
                           onClick={() => setGender(g)}
-                          className={`px-4 py-4 rounded-2xl text-base font-semibold border transition-all duration-200 ${
-                            gender === g
-                              ? "border-primary-500 bg-primary-50 text-primary-700 shadow-sm"
-                              : "border-warmgray-200 bg-ivory-50 text-warmgray-600 hover:border-primary-300"
-                          }`}
+                          className={choiceBtn(gender === g)}
                         >
                           {t(
                             g === "male"
@@ -322,10 +185,18 @@ export function EligibilitySimulator() {
                         </button>
                       ))}
                     </div>
-                  )}
-
-                  {step === 2 && (
-                    <div className="flex items-center gap-3">
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="weight-input"
+                      className="block text-base sm:text-lg font-display text-primary-900 mb-1"
+                    >
+                      {t("eligibility.weight")}
+                    </label>
+                    <p className="text-xs text-warmgray-600 leading-relaxed mb-2">
+                      {t("eligibility.weight.hint")}
+                    </p>
+                    <div className="flex items-center gap-2">
                       <input
                         id="weight-input"
                         type="number"
@@ -334,95 +205,100 @@ export function EligibilitySimulator() {
                         max={300}
                         value={weight}
                         onChange={(e) => setWeight(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleNext()}
+                        onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
                         placeholder="—"
-                        className="w-full px-5 py-4 text-2xl font-display text-primary-900 bg-ivory-50 border border-warmgray-200 rounded-2xl focus:border-primary-400 transition-colors outline-none"
-                        autoFocus
+                        className={fieldInput}
                       />
                       <span className="shrink-0 text-lg font-display text-warmgray-400">
                         kg
                       </span>
                     </div>
-                  )}
-
-                  {step === 3 && (
-                    <div className="grid grid-cols-2 gap-3">
+                  </div>
+                  <div>
+                    <p className="block text-base sm:text-lg font-display text-primary-900 mb-1">
+                      {t("eligibility.prevDonation")}
+                    </p>
+                    <p className="text-xs text-warmgray-600 leading-relaxed mb-2">
+                      {t("eligibility.prevDonation.hint")}
+                    </p>
+                    <div className="flex flex-nowrap items-stretch gap-2.5 min-h-[3.25rem] overflow-hidden">
                       <button
                         type="button"
-                        onClick={() => setHasDonatedBefore(true)}
-                        className={`px-4 py-4 rounded-2xl text-base font-semibold border transition-all duration-200 ${
-                          hasDonatedBefore === true
-                            ? "border-primary-500 bg-primary-50 text-primary-700 shadow-sm"
-                            : "border-warmgray-200 bg-ivory-50 text-warmgray-600 hover:border-primary-300"
-                        }`}
+                        onClick={() => {
+                          setHasDonatedBefore(true);
+                          setShowLastDate(true);
+                        }}
+                        className={`${choiceBtn(hasDonatedBefore === true)} min-w-0 flex-1`}
                       >
                         {t("eligibility.yes")}
                       </button>
+                      <div
+                        className="min-w-0 overflow-hidden transition-[width] duration-300 ease-out"
+                        style={{ width: showLastDate ? "36%" : 0 }}
+                      >
+                        <input
+                          id="date-input"
+                          type="date"
+                          value={lastDonationDate}
+                          max={new Date().toISOString().split("T")[0]}
+                          onChange={(e) => setLastDonationDate(e.target.value)}
+                          aria-label={t("eligibility.lastDonationDate")}
+                          title={t("eligibility.lastDonationDate")}
+                          tabIndex={showLastDate ? 0 : -1}
+                          className={`${fieldInput} h-full w-full text-base transition-transform duration-300 ease-out ${
+                            showLastDate ? "translate-x-0" : "translate-x-full"
+                          }`}
+                        />
+                      </div>
                       <button
                         type="button"
-                        onClick={() => setHasDonatedBefore(false)}
-                        className={`px-4 py-4 rounded-2xl text-base font-semibold border transition-all duration-200 ${
-                          hasDonatedBefore === false
-                            ? "border-primary-500 bg-primary-50 text-primary-700 shadow-sm"
-                            : "border-warmgray-200 bg-ivory-50 text-warmgray-600 hover:border-primary-300"
-                        }`}
+                        onClick={() => {
+                          setHasDonatedBefore(false);
+                          setLastDonationDate("");
+                          setShowLastDate(false);
+                        }}
+                        className={`${choiceBtn(hasDonatedBefore === false)} min-w-0 flex-1`}
                       >
                         {t("eligibility.no")}
                       </button>
                     </div>
-                  )}
+                  </div>
+                </div>
 
-                  {step === 4 && (
-                    <input
-                      id="date-input"
-                      type="date"
-                      value={lastDonationDate}
-                      max={new Date().toISOString().split("T")[0]}
-                      onChange={(e) => setLastDonationDate(e.target.value)}
-                      className="w-full px-5 py-4 text-lg font-display text-primary-900 bg-ivory-50 border border-warmgray-200 rounded-2xl focus:border-primary-400 transition-colors outline-none"
-                      autoFocus
+                {error && (
+                  <div
+                    role="alert"
+                    aria-live="assertive"
+                    aria-atomic="true"
+                    className="mt-3 flex items-start gap-2 text-sm text-error-700 bg-error-50 border border-error-200 rounded-xl px-3.5 py-2 animate-fade-in"
+                  >
+                    <AlertCircle
+                      className="w-4 h-4 mt-0.5 shrink-0"
+                      aria-hidden
                     />
-                  )}
+                    <span>{error}</span>
+                  </div>
+                )}
+
+                <div className="flex justify-end mt-auto pt-3">
+                  <Button onClick={handleSubmit}>
+                    {t("eligibility.seeResult")}
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
+            )}
 
-              {error && (
-                <div className="mt-4 flex items-start gap-2 text-sm text-error-700 bg-error-50 border border-error-200 rounded-xl px-4 py-2.5 animate-fade-in">
-                  <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span>{error}</span>
-                </div>
-              )}
-
-              <div className="flex items-center justify-between gap-3 mt-6 pt-4 border-t border-warmgray-100">
-                <button
-                  type="button"
-                  onClick={handleBack}
-                  disabled={step === 0}
-                  className="inline-flex items-center gap-2 text-sm font-medium text-warmgray-500 hover:text-primary-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  {t("eligibility.back")}
-                </button>
-                <Button onClick={handleNext}>
-                  {step === 4 || (step === 3 && hasDonatedBefore === false)
-                    ? t("eligibility.seeResult")
-                    : t("eligibility.next")}
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
+            {showResult && result && (
+              <div className="animate-scale-in">
+                <ResultDisplay
+                  result={result}
+                  onRestart={handleRestart}
+                  onScrollToSection={scrollToSection}
+                />
               </div>
-            </div>
-          )}
-
-          {/* Result step */}
-          {isResultStep && result && (
-            <div className="animate-scale-in">
-              <ResultDisplay
-                result={result}
-                onRestart={handleRestart}
-                onScrollToSection={scrollToSection}
-              />
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </section>
@@ -447,6 +323,9 @@ function ResultDisplay({
     <div className="space-y-6">
       {/* Result card */}
       <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
         className={`rounded-3xl p-8 sm:p-10 border-2 shadow-xl ${
           isEligible
             ? "bg-success-50 border-success-200 shadow-success-900/5"
@@ -474,7 +353,18 @@ function ResultDisplay({
             )}
           </div>
           <div className="flex-1">
-            <p className="text-lg sm:text-xl font-display text-primary-900 leading-relaxed">
+            {!isEligible && !isTemp && (
+              <p className="text-lg sm:text-xl font-display text-primary-900 mb-1.5">
+                {t("eligibility.result.ineligible")}
+              </p>
+            )}
+            <p
+              className={`${
+                !isEligible && !isTemp
+                  ? "text-base text-warmgray-600"
+                  : "text-lg sm:text-xl font-display text-primary-900"
+              } leading-relaxed`}
+            >
               {result.message}
             </p>
           </div>
@@ -482,7 +372,7 @@ function ResultDisplay({
 
         {/* Disclaimer */}
         <div className="mt-6 pt-6 border-t border-warmgray-200/50">
-          <p className="text-sm text-warmgray-500 italic leading-relaxed">
+          <p className="text-sm text-warmgray-600 italic leading-relaxed">
             {t("eligibility.disclaimer")}
           </p>
         </div>
@@ -522,7 +412,7 @@ function ResultDisplay({
       <div className="flex justify-center">
         <button
           onClick={onRestart}
-          className="inline-flex items-center gap-2 text-sm font-medium text-warmgray-500 hover:text-primary-700 transition-colors"
+          className="inline-flex items-center gap-2 text-sm font-medium text-warmgray-600 hover:text-primary-700 transition-colors"
         >
           <RotateCcw className="w-4 h-4" />
           {t("eligibility.restart")}
@@ -548,7 +438,7 @@ function DonorCard() {
             <p className="text-xs font-bold uppercase tracking-widest text-accent-300">
               {t("eligibility.card.title")}
             </p>
-            <p className="text-sm text-primary-200 mt-1">HemoLink</p>
+            <p className="text-sm text-primary-200 mt-1">1Don3Vies</p>
           </div>
           <div className="w-10 h-10 rounded-full bg-ivory-50/10 flex items-center justify-center">
             <Check className="w-5 h-5 text-accent-300" />

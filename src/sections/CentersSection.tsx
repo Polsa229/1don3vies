@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, type ReactNode, lazy, Suspense } from 'react';
+import { useState, useMemo, useEffect, useRef, type ReactNode, lazy, Suspense } from 'react';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { Link, useSearchParams } from 'react-router-dom';
 import { CountdownBlocks } from '@/components/shared/CountdownBlocks';
@@ -317,7 +317,7 @@ export function CentersSection({
   return (
     <section
       id="centers"
-      className={`relative ${compact ? 'py-10 lg:py-12' : 'py-24 lg:py-32'}`}
+      className={`relative ${compact ? 'py-6 lg:py-12' : 'py-8 lg:py-24'}`}
     >
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
         <InkBlot
@@ -362,7 +362,7 @@ export function CentersSection({
                     key={id}
                     onClick={() => setTab(id)}
                     aria-pressed={tab === id}
-                    className={`relative z-10 px-5 sm:px-6 py-2.5 text-sm font-semibold rounded-full transition-colors duration-200 ${
+                    className={`relative z-10 px-3 sm:px-6 py-1.5 sm:py-2.5 text-[11px] sm:text-sm font-semibold rounded-full transition-colors duration-200 ${
                       tab === id ? 'text-ivory-50' : 'text-warmgray-600 hover:text-primary-700'
                     }`}
                   >
@@ -548,7 +548,7 @@ export function CentersSection({
                         hideSearch
                         mode={filterMode}
                       />
-                      <p className="text-xs text-warmgray-500 tabular-nums">
+                      <p className="text-xs text-warmgray-600 tabular-nums">
                         {t('centers.filters.results').replace('{n}', String(resultCount))}
                       </p>
                       <div className="flex flex-col gap-2">
@@ -658,7 +658,7 @@ function CentersFilters({
             <SlidersHorizontal className="w-4 h-4 text-primary-600" />
             <p className="text-sm font-semibold text-primary-900">{t('centers.filters.title')}</p>
           </div>
-          <p className="text-xs text-warmgray-500 tabular-nums">
+          <p className="text-xs text-warmgray-600 tabular-nums">
             {t('centers.filters.results').replace('{n}', String(resultCount))}
           </p>
         </div>
@@ -863,8 +863,8 @@ function PermanentCenters({
       ) : (
         <>
           <motion.div
-            className={`grid grid-cols-1 gap-5 ${
-              dense ? 'sm:grid-cols-2' : 'sm:grid-cols-2 lg:grid-cols-3'
+            className={`grid grid-cols-2 gap-3 sm:gap-5 ${
+              dense ? '' : 'lg:grid-cols-3'
             }`}
             variants={staggerContainer}
             initial="hidden"
@@ -949,17 +949,49 @@ function DetailModalShell({
   children: ReactNode;
 }) {
   const { t } = useI18n();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!open) return;
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose();
-    }
+
+    triggerRef.current = document.activeElement as HTMLElement | null;
     document.body.style.overflow = 'hidden';
+
+    const focusTimer = window.setTimeout(() => dialogRef.current?.focus(), 0);
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+      if (e.key !== 'Tab' || !dialogRef.current) return;
+
+      const focusable = Array.from(
+        dialogRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      );
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+
     window.addEventListener('keydown', onKeyDown);
     return () => {
+      window.clearTimeout(focusTimer);
       document.body.style.overflow = '';
       window.removeEventListener('keydown', onKeyDown);
+      triggerRef.current?.focus();
     };
   }, [open, onClose]);
 
@@ -980,10 +1012,12 @@ function DetailModalShell({
             onClick={onClose}
           />
           <motion.div
+            ref={dialogRef}
+            tabIndex={-1}
             role="dialog"
             aria-modal="true"
             aria-label={title}
-            className="relative w-full sm:max-w-lg max-h-[88vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-surface shadow-2xl border border-warmgray-200/60"
+            className="relative w-full sm:max-w-lg max-h-[88vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-surface shadow-2xl border border-warmgray-200/60 focus:outline-none"
             initial={{ opacity: 0, y: 24, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.98 }}
@@ -1029,41 +1063,44 @@ function CenterCard({
       variants={fadeUp}
       whileHover={{ y: -4, transition: { duration: 0.2 } }}
       onClick={onOpen}
-      className="text-left bg-white rounded-2xl border border-warmgray-200/50 shadow-sm hover:shadow-lg transition-shadow duration-300 overflow-hidden group p-5 flex flex-col h-full w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+      className="text-left bg-white rounded-2xl border border-warmgray-200/50 shadow-sm hover:shadow-lg transition-shadow duration-300 overflow-hidden group p-3 sm:p-5 flex flex-col h-full w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
     >
-      <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="min-w-0">
-          <h3 className="font-display text-lg text-primary-900 leading-tight line-clamp-2">
-            {center.name}
-          </h3>
-          <p className="text-xs text-warmgray-500 mt-1 flex items-center gap-1.5 truncate">
-            <Building2 className="w-3 h-3 shrink-0" />
-            <span className="truncate">{center.nature}</span>
-          </p>
-        </div>
+      <span
+        className={`self-start mb-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold ${
+          status.isOpen
+            ? 'bg-success-100 text-success-700'
+            : 'bg-warmgray-100 text-warmgray-600'
+        }`}
+      >
         <span
-          className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ${
-            status.isOpen
-              ? 'bg-success-100 text-success-700'
-              : 'bg-warmgray-100 text-warmgray-500'
-          }`}
-        >
-          <span
-            className={`w-1.5 h-1.5 rounded-full ${status.isOpen ? 'bg-success-500' : 'bg-warmgray-400'}`}
-          />
+          className={`w-1.5 h-1.5 rounded-full ${status.isOpen ? 'bg-success-500' : 'bg-warmgray-400'}`}
+        />
+        <span className="sm:hidden">
+          {status.isOpen ? t('centers.open.short') : t('centers.closed.short')}
+        </span>
+        <span className="hidden sm:inline">
           {status.isOpen ? t('centers.open') : t('centers.closed')}
         </span>
-      </div>
+      </span>
 
-      <div className="flex items-start gap-2 text-sm text-warmgray-600 mb-3">
-        <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-warmgray-400" />
-        <span className="line-clamp-2">
+      <h3 className="font-display text-[13px] sm:text-lg text-primary-900 leading-snug line-clamp-2 mb-1.5">
+        {center.name}
+      </h3>
+
+      <p className="hidden sm:flex text-xs text-warmgray-600 mb-2 items-center gap-1.5 truncate">
+        <Building2 className="w-3 h-3 shrink-0" />
+        <span className="truncate">{center.nature}</span>
+      </p>
+
+      <div className="flex items-center gap-1.5 text-[11px] sm:text-sm text-warmgray-600 mb-3 min-w-0">
+        <MapPin className="w-3.5 h-3.5 shrink-0 text-warmgray-400" />
+        <span className="truncate">
           {center.city}
           {distance !== null ? ` · ${distance} km` : ''}
         </span>
       </div>
 
-      <div className="flex flex-wrap gap-1.5 mb-4">
+      <div className="hidden sm:flex flex-wrap gap-1.5 mb-4">
         {center.donationTypes.slice(0, 3).map((type) => (
           <span
             key={type}
@@ -1074,9 +1111,9 @@ function CenterCard({
         ))}
       </div>
 
-      <span className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 group-hover:gap-2.5 transition-all">
+      <span className="mt-auto inline-flex items-center gap-1 text-[11px] sm:text-sm font-semibold text-primary-700 group-hover:gap-2.5 transition-all">
         {t('centers.viewDetails')}
-        <ArrowRight className="w-4 h-4" />
+        <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
       </span>
     </motion.button>
   );
@@ -1104,7 +1141,7 @@ function CenterDetailModal({
             <h3 className="font-display text-2xl text-primary-900 leading-tight mb-2">
               {center.name}
             </h3>
-            <p className="text-sm text-warmgray-500 flex items-center gap-1.5">
+            <p className="text-sm text-warmgray-600 flex items-center gap-1.5">
               <Building2 className="w-4 h-4" />
               {center.nature}
             </p>
@@ -1112,7 +1149,7 @@ function CenterDetailModal({
               className={`mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
                 status.isOpen
                   ? 'bg-success-100 text-success-700'
-                  : 'bg-warmgray-100 text-warmgray-500'
+                  : 'bg-warmgray-100 text-warmgray-600'
               }`}
             >
               <span
@@ -1149,7 +1186,7 @@ function CenterDetailModal({
           <div className="bg-ivory-50 rounded-2xl p-4 border border-warmgray-100">
             <div className="flex items-center gap-1.5 mb-3">
               <Clock className="w-3.5 h-3.5 text-warmgray-400" />
-              <span className="text-xs font-semibold text-warmgray-500 uppercase tracking-wide">
+              <span className="text-xs font-semibold text-warmgray-600 uppercase tracking-wide">
                 {t('centers.hours')}
               </span>
             </div>
@@ -1170,7 +1207,7 @@ function CenterDetailModal({
           </div>
 
           <div>
-            <p className="text-xs font-semibold text-warmgray-500 uppercase tracking-wide mb-2">
+            <p className="text-xs font-semibold text-warmgray-600 uppercase tracking-wide mb-2">
               {t('centers.types')}
             </p>
             <div className="flex flex-wrap gap-2">
@@ -1219,12 +1256,16 @@ function CenterDetailModal({
 
 function NoResults({ message, suggestion }: { message: string; suggestion: string }) {
   return (
-    <div className="text-center py-16 px-6">
+    <div
+      role="status"
+      aria-live="polite"
+      className="text-center py-16 px-6"
+    >
       <div className="w-16 h-16 rounded-full bg-warmgray-100 flex items-center justify-center mx-auto mb-4">
         <Search className="w-7 h-7 text-warmgray-400" />
       </div>
       <p className="text-lg font-display text-primary-900 mb-2">{message}</p>
-      <p className="text-sm text-warmgray-500 max-w-sm mx-auto">{suggestion}</p>
+      <p className="text-sm text-warmgray-600 max-w-sm mx-auto">{suggestion}</p>
     </div>
   );
 }
@@ -1344,8 +1385,8 @@ function CampaignsView({
       ) : (
         <>
           <motion.div
-            className={`grid grid-cols-1 gap-5 ${
-              dense ? 'sm:grid-cols-2' : 'sm:grid-cols-2 lg:grid-cols-3'
+            className={`grid grid-cols-2 gap-3 sm:gap-5 ${
+              dense ? '' : 'lg:grid-cols-3'
             }`}
             variants={staggerContainer}
             initial="hidden"
@@ -1450,73 +1491,80 @@ function CampaignCard({
     >
       <div className={`h-1.5 w-full ${accentBar}`} />
 
-      <div className="p-5 flex-1 flex flex-col">
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border ${statusBadge}`}
-          >
-            {isOngoing && (
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inset-0 rounded-full bg-success-500 animate-ping opacity-60" />
-                <span className="relative rounded-full h-1.5 w-1.5 bg-success-500" />
-              </span>
-            )}
-            {t(
-              lifecycle === 'ongoing'
-                ? 'campaigns.status.ongoing'
-                : lifecycle === 'upcoming'
-                  ? 'campaigns.status.upcoming'
-                  : 'campaigns.status.ended',
-            )}
-          </span>
-        </div>
+      <div className="p-3 sm:p-5 flex-1 flex flex-col">
+        <span
+          className={`self-start mb-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${statusBadge}`}
+        >
+          {isOngoing && (
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inset-0 rounded-full bg-success-500 animate-ping opacity-60" />
+              <span className="relative rounded-full h-1.5 w-1.5 bg-success-500" />
+            </span>
+          )}
+          {t(
+            lifecycle === 'ongoing'
+              ? 'campaigns.status.ongoing'
+              : lifecycle === 'upcoming'
+                ? 'campaigns.status.upcoming'
+                : 'campaigns.status.ended',
+          )}
+        </span>
 
         <h3
-          className={`font-display text-lg leading-snug mb-3 line-clamp-2 text-balance ${
+          className={`font-display text-[13px] sm:text-lg leading-snug mb-2 line-clamp-2 ${
             isEnded ? 'text-warmgray-700' : 'text-primary-900'
           }`}
         >
           {campaign.name}
         </h3>
 
-        <div className="space-y-1.5 text-sm text-warmgray-600 mb-4">
-          <p className="flex items-center gap-2 truncate">
+        <div className="space-y-1 text-[11px] sm:text-sm text-warmgray-600 mb-2.5 sm:mb-4">
+          <p className="flex items-center gap-1.5 min-w-0">
             <MapPin className="w-3.5 h-3.5 shrink-0 text-warmgray-400" />
             <span className="truncate">
-              {campaign.city} · {dateShort}
+              {campaign.city}
               {distance != null ? ` · ${distance} km` : ''}
             </span>
           </p>
-          <p className="flex items-center gap-2">
+          <p className="flex items-center gap-1.5">
             <Clock className="w-3.5 h-3.5 shrink-0 text-warmgray-400" />
-            {campaign.startTime} — {campaign.endTime}
+            <span className="truncate">
+              {dateShort} · {campaign.startTime}–{campaign.endTime}
+            </span>
           </p>
         </div>
 
         {!isEnded ? (
-          <div className="mb-4">
-            <p className="text-[10px] uppercase tracking-wider text-warmgray-400 font-semibold mb-2">
+          <div className="mb-3 sm:mb-4">
+            <p className="text-[9px] sm:text-[10px] uppercase tracking-wider text-warmgray-400 font-semibold mb-1.5">
               {t(isOngoing ? 'campaigns.status.ongoingEndsIn' : 'campaigns.status.startsIn')}
             </p>
-            <CountdownBlocks countdown={countdown} compact />
+            <p className="sm:hidden font-display text-sm font-semibold text-primary-900 tabular-nums">
+              {String(countdown.days).padStart(2, '0')}j{' '}
+              {String(countdown.hours).padStart(2, '0')}h{' '}
+              {String(countdown.minutes).padStart(2, '0')}min
+            </p>
+            <div className="hidden sm:block">
+              <CountdownBlocks countdown={countdown} compact />
+            </div>
           </div>
         ) : (
           campaign.bagsCollected != null && (
-            <div className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-primary-50 px-2.5 py-1 text-xs font-semibold text-primary-800 border border-primary-100 self-start">
+            <div className="mb-3 sm:mb-4 inline-flex items-center gap-1.5 rounded-full bg-primary-50 px-2 py-0.5 text-[11px] font-semibold text-primary-800 border border-primary-100 self-start">
               <Droplet className="w-3.5 h-3.5 text-primary-600" fill="currentColor" />
               {t('campaigns.status.bagsCollected').replace('{n}', String(campaign.bagsCollected))}
             </div>
           )
         )}
 
-        <div className="mt-auto pt-3 border-t border-warmgray-100 flex items-center justify-between gap-2">
-          <div className="flex flex-wrap gap-1.5">
-            {campaign.soughtGroups.slice(0, 3).map((group) => (
+        <div className="mt-auto pt-2.5 border-t border-warmgray-100 flex items-center justify-between gap-1.5">
+          <div className="flex flex-wrap gap-1 min-w-0">
+            {campaign.soughtGroups.slice(0, 2).map((group) => (
               <span
                 key={group}
-                className={`inline-flex min-w-[2.25rem] items-center justify-center px-2 py-0.5 rounded-md text-[11px] font-bold tracking-wide border ${
+                className={`inline-flex min-w-[1.75rem] items-center justify-center px-1.5 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold tracking-wide border ${
                   isEnded
-                    ? 'bg-warmgray-50 text-warmgray-500 border-warmgray-200'
+                    ? 'bg-warmgray-50 text-warmgray-600 border-warmgray-200'
                     : 'bg-primary-50 text-primary-800 border-primary-100'
                 }`}
               >
@@ -1524,8 +1572,8 @@ function CampaignCard({
               </span>
             ))}
           </div>
-          <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary-700 shrink-0">
-            {t('campaigns.viewDetails')}
+          <span className="inline-flex items-center gap-0.5 text-[10px] sm:text-xs font-semibold text-primary-700 shrink-0">
+            <span className="hidden sm:inline">{t('campaigns.viewDetails')}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </span>
         </div>

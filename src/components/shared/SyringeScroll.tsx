@@ -72,7 +72,7 @@ export function SyringeScroll({ className = "" }: { className?: string }) {
       </div>
 
       {/* Label */}
-      <p className="mt-6 text-xs font-medium uppercase tracking-widest text-warmgray-500 text-center max-w-[140px]">
+      <p className="mt-6 text-xs font-medium uppercase tracking-widest text-warmgray-600 text-center max-w-[140px]">
         Don de vie
       </p>
     </div>

@@ -21,18 +21,18 @@ export function Hero() {
   }
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 lg:pt-20">
+    <section className="relative min-h-[88vh] flex items-center justify-center overflow-hidden pt-16 lg:pt-20 pb-6">
       {/* Dotted world map background */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.28] pointer-events-none"
-        style={{ backgroundImage: "url('/dotted_world_map.jpeg')" }}
+        style={{ backgroundImage: "url('/dotted_world_map.webp')" }}
         aria-hidden
       />
 
       {/* Soft ivory overlay for readability */}
       <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/70 to-background pointer-events-none" />
 
-      <div className="container-hemo relative z-10 flex flex-col items-center text-center py-20">
+      <div className="container-hemo relative z-10 flex flex-col items-center text-center py-8 lg:py-16">
         <motion.p
           className="eyebrow mb-6"
           initial={{ opacity: 0, y: 10 }}
@@ -88,7 +88,7 @@ export function Hero() {
       </div>
 
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        className="absolute bottom-3 left-1/2 -translate-x-1/2"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5, duration: 0.5 }}
@@ -97,7 +97,7 @@ export function Hero() {
           <span className="text-xs font-medium uppercase tracking-wider">
             {lang === 'fr' ? 'Défiler' : 'Scroll'}
           </span>
-          <div className="w-px h-12 bg-gradient-to-b from-warmgray-300 to-transparent" />
+          <div className="w-px h-8 bg-gradient-to-b from-warmgray-300 to-transparent" />
         </div>
       </motion.div>
     </section>

@@ -1,6 +1,7 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, CircleMarker, useMap } from 'react-leaflet';
 import L from 'leaflet';
+import { Crosshair, Maximize2, Minimize2 } from 'lucide-react';
 import { useI18n } from '@/i18n/useI18n';
 import { directionsUrl } from '@/lib/maps';
 import 'leaflet/dist/leaflet.css';
@@ -21,7 +22,7 @@ interface DonateMapProps {
   className?: string;
 }
 
-const DEFAULT_CENTER: [number, number] = [7.5, 2.1]; // Bénin
+const DEFAULT_CENTER: [number, number] = [7.5, 2.1];
 const DEFAULT_ZOOM = 7;
 
 function createPinIcon() {
@@ -41,37 +42,50 @@ function createPinIcon() {
 
 const pinIcon = createPinIcon();
 
+function fitMapToPoints(
+  map: L.Map,
+  markers: MapMarkerItem[],
+  userCoords?: { lat: number; lng: number } | null,
+) {
+  const points: [number, number][] = markers.map((m) => [m.lat, m.lng]);
+  if (userCoords) points.push([userCoords.lat, userCoords.lng]);
+
+  if (points.length === 0) {
+    map.setView(DEFAULT_CENTER, DEFAULT_ZOOM);
+    return;
+  }
+
+  if (points.length === 1) {
+    map.setView(points[0], 12);
+    return;
+  }
+
+  map.fitBounds(L.latLngBounds(points), { padding: [48, 48], maxZoom: 13 });
+}
+
 function FitBounds({
   markers,
   userCoords,
+  recenterToken,
 }: {
   markers: MapMarkerItem[];
   userCoords?: { lat: number; lng: number } | null;
+  recenterToken: number;
 }) {
   const map = useMap();
 
   useEffect(() => {
-    const points: [number, number][] = markers.map((m) => [m.lat, m.lng]);
-    if (userCoords) points.push([userCoords.lat, userCoords.lng]);
-
-    if (points.length === 0) {
-      map.setView(DEFAULT_CENTER, DEFAULT_ZOOM);
-      return;
-    }
-
-    if (points.length === 1) {
-      map.setView(points[0], 12);
-      return;
-    }
-
-    map.fitBounds(L.latLngBounds(points), { padding: [48, 48], maxZoom: 13 });
-  }, [map, markers, userCoords]);
+    fitMapToPoints(map, markers, userCoords);
+  }, [map, markers, userCoords, recenterToken]);
 
   return null;
 }
 
 export function DonateMap({ markers, userCoords = null, onSelect, className = '' }: DonateMapProps) {
   const { t } = useI18n();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [recenterToken, setRecenterToken] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const center = useMemo<[number, number]>(() => {
     if (userCoords) return [userCoords.lat, userCoords.lng];
@@ -84,9 +98,35 @@ export function DonateMap({ markers, userCoords = null, onSelect, className = ''
     return DEFAULT_CENTER;
   }, [markers, userCoords]);
 
+  useEffect(() => {
+    function onFullscreenChange() {
+      setIsFullscreen(document.fullscreenElement === containerRef.current);
+    }
+
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
+  }, []);
+
+  async function toggleFullscreen() {
+    const el = containerRef.current;
+    if (!el) return;
+
+    if (document.fullscreenElement === el) {
+      await document.exitFullscreen();
+      return;
+    }
+
+    await el.requestFullscreen();
+  }
+
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl border border-warmgray-200/80 shadow-sm shadow-primary-900/[0.04] bg-surface h-full min-h-[min(70vh,560px)] ${className}`}
+      ref={containerRef}
+      className={`relative overflow-hidden bg-surface ${
+        isFullscreen
+          ? 'h-screen w-screen rounded-none border-0'
+          : `rounded-2xl border border-warmgray-200/80 shadow-sm shadow-primary-900/[0.04] h-full min-h-[min(70vh,560px)] ${className}`
+      }`}
     >
       <MapContainer
         center={center}
@@ -98,7 +138,11 @@ export function DonateMap({ markers, userCoords = null, onSelect, className = ''
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <FitBounds markers={markers} userCoords={userCoords} />
+        <FitBounds
+          markers={markers}
+          userCoords={userCoords}
+          recenterToken={recenterToken}
+        />
 
         {userCoords && (
           <CircleMarker
@@ -146,6 +190,27 @@ export function DonateMap({ markers, userCoords = null, onSelect, className = ''
           </Marker>
         ))}
       </MapContainer>
+
+      <div className="absolute top-3 right-3 z-[500] flex flex-col gap-2">
+        <button
+          type="button"
+          onClick={() => setRecenterToken((n) => n + 1)}
+          className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-warmgray-200/90 bg-surface/95 text-primary-800 shadow-md backdrop-blur-sm hover:bg-primary-50 transition-colors"
+          aria-label={t('centers.map.recenter')}
+          title={t('centers.map.recenter')}
+        >
+          <Crosshair className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          onClick={toggleFullscreen}
+          className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-warmgray-200/90 bg-surface/95 text-primary-800 shadow-md backdrop-blur-sm hover:bg-primary-50 transition-colors"
+          aria-label={isFullscreen ? t('centers.map.exitFullscreen') : t('centers.map.fullscreen')}
+          title={isFullscreen ? t('centers.map.exitFullscreen') : t('centers.map.fullscreen')}
+        >
+          {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+        </button>
+      </div>
 
       {markers.length === 0 && (
         <div className="absolute inset-0 z-[400] flex items-center justify-center bg-background/70 backdrop-blur-[2px] pointer-events-none">

@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
+  filterCentersList,
   getCenterStatus,
   haversineDistance,
   isCenterOpenNow,
 } from './centers.logic';
+import { centers } from '@/data/centers.data';
 import type { Center } from '@/features/eligibility/eligibility.types';
 
 const sampleCenter: Center = {
@@ -67,5 +69,25 @@ describe('haversineDistance', () => {
     const cotonouToPortoNovo = haversineDistance(6.3703, 2.3912, 6.4969, 2.6289);
     expect(cotonouToPortoNovo).toBeGreaterThan(0);
     expect(cotonouToPortoNovo).toBeLessThan(50);
+  });
+});
+
+describe('filterCentersList', () => {
+  it('retourne tous les centres sans filtre', () => {
+    expect(filterCentersList(centers, '', 'all', 'all', 'all', null)).toHaveLength(
+      centers.length,
+    );
+  });
+
+  it('retourne un tableau vide si la recherche ne correspond à rien', () => {
+    expect(
+      filterCentersList(centers, '___aucun_resultat___', 'all', 'all', 'all', null),
+    ).toEqual([]);
+  });
+
+  it('filtre par ville', () => {
+    const result = filterCentersList(centers, '', 'Cotonou', 'all', 'all', null);
+    expect(result.length).toBeGreaterThan(0);
+    expect(result.every((c) => c.city === 'Cotonou')).toBe(true);
   });
 });

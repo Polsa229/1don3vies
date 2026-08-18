@@ -21,3 +21,10 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Test & coverage
+coverage
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/

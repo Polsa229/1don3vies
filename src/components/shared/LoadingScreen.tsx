@@ -23,6 +23,10 @@ export function LoadingScreen({ onComplete }: { onComplete: () => void }) {
     <AnimatePresence>
       {visible && (
         <motion.div
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+          aria-label="Chargement en cours"
           className="fixed inset-0 z-[200] flex flex-col items-center justify-center overflow-hidden"
           style={{ backgroundColor: '#241C20' }}
           initial={{ opacity: 1 }}

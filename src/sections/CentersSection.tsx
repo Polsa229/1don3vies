@@ -9,11 +9,12 @@ import { Button } from '@/components/ui/Button';
 import { useGeolocation } from '@/lib/hooks/useGeolocation';
 import { useCountdown } from '@/lib/hooks/useCountdown';
 import { useMounted } from '@/lib/hooks/useMounted';
-import { getCenterStatus, haversineDistance } from '@/features/centers/centers.logic';
+import { getCenterStatus, haversineDistance, filterCentersList, filterCampaignsList } from '@/features/centers/centers.logic';
 import { getCampaignLifecycle } from '@/features/centers/campaign.logic';
+import { NoResults } from '@/components/shared/NoResults';
 import { centers as allCenters } from '@/data/centers.data';
 import { campaigns as allCampaigns } from '@/data/campaigns.data';
-import type { Center, Campaign, DonationType } from '@/features/eligibility/eligibility.types';
+import type { Center, Campaign } from '@/features/eligibility/eligibility.types';
 import { fadeUp, scaleIn, staggerContainer, viewportOnce } from '@/lib/motion';
 import { directionsUrl } from '@/lib/maps';
 import {
@@ -56,97 +57,6 @@ interface SharedFilters {
   appointmentFilter: string;
   statusFilter: string;
   geo: ReturnType<typeof useGeolocation>;
-}
-
-function filterCentersList(
-  search: string,
-  cityFilter: string,
-  typeFilter: string,
-  appointmentFilter: string,
-  coords: { lat: number; lng: number } | null,
-) {
-  let result = allCenters.filter((c) => {
-    if (search) {
-      const q = search.toLowerCase();
-      if (
-        !c.name.toLowerCase().includes(q) &&
-        !c.city.toLowerCase().includes(q) &&
-        !c.address.toLowerCase().includes(q)
-      ) {
-        return false;
-      }
-    }
-    if (cityFilter !== 'all' && c.city !== cityFilter) return false;
-    if (typeFilter !== 'all' && !c.donationTypes.includes(typeFilter as DonationType)) return false;
-    if (appointmentFilter === 'yes' && !c.appointmentRequired) return false;
-    if (appointmentFilter === 'no' && c.appointmentRequired) return false;
-    return true;
-  });
-
-  if (coords) {
-    result = result
-      .map((c) => ({
-        center: c,
-        distance: haversineDistance(coords.lat, coords.lng, c.lat, c.lng),
-      }))
-      .sort((a, b) => a.distance - b.distance)
-      .map((x) => x.center);
-  }
-
-  return result;
-}
-
-function filterCampaignsList(
-  search: string,
-  cityFilter: string,
-  typeFilter: string,
-  appointmentFilter: string,
-  statusFilter: string,
-  coords: { lat: number; lng: number } | null,
-) {
-  let result = allCampaigns.filter((c) => {
-    if (search) {
-      const q = search.toLowerCase();
-      if (
-        !c.name.toLowerCase().includes(q) &&
-        !c.city.toLowerCase().includes(q) &&
-        !c.location.toLowerCase().includes(q) &&
-        !c.organizer.toLowerCase().includes(q)
-      ) {
-        return false;
-      }
-    }
-    if (cityFilter !== 'all' && c.city !== cityFilter) return false;
-    if (typeFilter !== 'all' && !c.donationTypes.includes(typeFilter as DonationType)) return false;
-    if (appointmentFilter === 'yes' && !c.appointmentRequired) return false;
-    if (appointmentFilter === 'no' && c.appointmentRequired) return false;
-    if (statusFilter !== 'all' && getCampaignLifecycle(c) !== statusFilter) return false;
-    return true;
-  });
-
-  const rank = { ongoing: 0, upcoming: 1, ended: 2 } as const;
-
-  if (coords) {
-    result = result
-      .map((c) => ({
-        campaign: c,
-        distance: haversineDistance(coords.lat, coords.lng, c.lat, c.lng),
-      }))
-      .sort((a, b) => {
-        if (a.distance !== b.distance) return a.distance - b.distance;
-        return rank[getCampaignLifecycle(a.campaign)] - rank[getCampaignLifecycle(b.campaign)];
-      })
-      .map((x) => x.campaign);
-  } else {
-    result = [...result].sort((a, b) => {
-      const ra = rank[getCampaignLifecycle(a)];
-      const rb = rank[getCampaignLifecycle(b)];
-      if (ra !== rb) return ra - rb;
-      return new Date(a.date).getTime() - new Date(b.date).getTime();
-    });
-  }
-
-  return result;
 }
 
 export function CentersSection({
@@ -229,13 +139,14 @@ export function CentersSection({
 
   const centersFiltered = useMemo(
     () =>
-      filterCentersList(search, cityFilter, typeFilter, appointmentFilter, geo.coords),
+      filterCentersList(allCenters, search, cityFilter, typeFilter, appointmentFilter, geo.coords),
     [search, cityFilter, typeFilter, appointmentFilter, geo.coords],
   );
 
   const campaignsFiltered = useMemo(
     () =>
       filterCampaignsList(
+        allCampaigns,
         search,
         cityFilter,
         typeFilter,
@@ -825,6 +736,7 @@ function PermanentCenters({
     if (prefiltered) return prefiltered;
     if (shared) {
       return filterCentersList(
+        allCenters,
         shared.search,
         shared.cityFilter,
         shared.typeFilter,
@@ -1254,22 +1166,6 @@ function CenterDetailModal({
   );
 }
 
-function NoResults({ message, suggestion }: { message: string; suggestion: string }) {
-  return (
-    <div
-      role="status"
-      aria-live="polite"
-      className="text-center py-16 px-6"
-    >
-      <div className="w-16 h-16 rounded-full bg-warmgray-100 flex items-center justify-center mx-auto mb-4">
-        <Search className="w-7 h-7 text-warmgray-400" />
-      </div>
-      <p className="text-lg font-display text-primary-900 mb-2">{message}</p>
-      <p className="text-sm text-warmgray-600 max-w-sm mx-auto">{suggestion}</p>
-    </div>
-  );
-}
-
 function PaginationBar({
   currentPage,
   totalPages,
@@ -1335,6 +1231,7 @@ function CampaignsView({
     if (prefiltered) return prefiltered;
     if (shared) {
       return filterCampaignsList(
+        allCampaigns,
         shared.search,
         shared.cityFilter,
         shared.typeFilter,
@@ -1343,7 +1240,7 @@ function CampaignsView({
         shared.geo.coords,
       );
     }
-    return filterCampaignsList('', 'all', 'all', 'all', 'all', null);
+    return filterCampaignsList(allCampaigns, '', 'all', 'all', 'all', 'all', null);
   }, [prefiltered, shared]);
 
   const geo = shared?.geo;

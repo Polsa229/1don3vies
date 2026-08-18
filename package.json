@@ -14,13 +14,13 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
+    "test:e2e": "playwright install chromium && playwright test",
+    "test:e2e:ui": "playwright install chromium && playwright test --ui",
     "precommit-check": "eslint . && tsc --noEmit -p tsconfig.app.json && vitest run",
-    "prepush-check": "playwright test",
+    "prepush-check": "playwright install chromium && playwright test",
     "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "verify:all": "pnpm verify && CI=true pnpm test:e2e",
-    "setup": "pnpm exec playwright install chromium",
+    "setup": "playwright install chromium",
     "prepare": "husky"
   },
   "dependencies": {

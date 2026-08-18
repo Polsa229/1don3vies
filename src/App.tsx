@@ -146,13 +146,16 @@ function App() {
   useEffect(() => {
     if (loading) return;
 
-    const idle = window.requestIdleCallback;
+    const idle =
+      typeof window.requestIdleCallback === 'function'
+        ? window.requestIdleCallback
+        : undefined;
     const id = idle
       ? idle(() => setWidgetsReady(true), { timeout: 2000 })
       : window.setTimeout(() => setWidgetsReady(true), 600);
 
     return () => {
-      if (idle) window.cancelIdleCallback(id);
+      if (idle) window.cancelIdleCallback(id as number);
       else window.clearTimeout(id);
     };
   }, [loading]);

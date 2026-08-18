@@ -56,7 +56,10 @@ Build : `pnpm build` puis `pnpm preview`.
 |---|---|
 | `pnpm lint` | ESLint |
 | `pnpm typecheck` | TypeScript `--noEmit` |
-| `pnpm precommit-check` | Lint + typecheck |
+| `pnpm test` | Vitest (unitaires + composants) |
+| `pnpm test:watch` | Tests en mode watch |
+| `pnpm test:coverage` | Couverture v8 |
+| `pnpm precommit-check` | Lint + typecheck + tests |
 
 ## Livrables
 

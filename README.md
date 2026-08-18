@@ -45,6 +45,7 @@ src/
 
 ```bash
 pnpm install
+pnpm setup   # une fois : installe Chromium pour Playwright
 pnpm dev
 ```
 
@@ -59,7 +60,26 @@ Build : `pnpm build` puis `pnpm preview`.
 | `pnpm test` | Vitest (unitaires + composants) |
 | `pnpm test:watch` | Tests en mode watch |
 | `pnpm test:coverage` | Couverture v8 |
-| `pnpm precommit-check` | Lint + typecheck + tests |
+| `pnpm test:e2e` | Playwright (mobile 390px + desktop 1440px) |
+| `pnpm precommit-check` | Lint + typecheck + tests unitaires |
+| `pnpm prepush-check` | Playwright e2e (alias interne du hook pre-push) |
+| `pnpm verify` | Pipeline qualité (lint → typecheck → test → build) |
+| `pnpm verify:all` | Pipeline complet + e2e |
+
+## Automatisation
+
+Les contrôles qualité tournent **sans action manuelle** aux moments clés :
+
+| Moment | Ce qui s'exécute |
+|---|---|
+| **`git commit`** (hook Husky) | `precommit-check` — lint, typecheck, 35 tests Vitest |
+| **`git push`** (hook Husky) | `test:e2e` — 14 tests Playwright (mobile + desktop) |
+| **Push / PR sur `main`** (GitHub Actions) | Job `quality` (`pnpm verify`) puis job `e2e` |
+| **Déploiement Vercel** | `precommit-check` puis build — pas de deploy si les tests échouent |
+
+Après un clone, lancer une fois `pnpm setup` pour installer Chromium (requis pour le hook pre-push et les e2e locaux).
+
+Pour contourner un hook en urgence : `git commit --no-verify` ou `git push --no-verify` (à éviter sauf cas exceptionnel).
 
 ## Livrables
 

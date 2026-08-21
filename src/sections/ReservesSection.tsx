@@ -102,8 +102,7 @@ export function ReservesSection() {
     <section id="reserves" className="relative py-8 lg:py-24 bg-ivory-100 overflow-hidden">
       <InkBlot
         variant={4}
-        color="#691735"
-        className="absolute -top-20 -right-32 w-[400px] h-[560px] opacity-[0.03]"
+        className="absolute -top-20 -right-32 w-[400px] h-[560px] opacity-[0.03] text-primary-dark"
       />
 
       <div className="container-hemo relative z-10">

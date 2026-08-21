@@ -31,8 +31,7 @@ export function FaqSection() {
     <section id="faq" className="relative py-8 lg:py-24 overflow-hidden">
       <InkBlot
         variant={2}
-        color="#691735"
-        className="absolute top-20 -left-40 w-[500px] h-[700px] opacity-[0.03]"
+        className="absolute top-20 -left-40 w-[500px] h-[700px] opacity-[0.03] text-primary-dark"
       />
 
       <div className="container-hemo relative z-10">

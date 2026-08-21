@@ -5,7 +5,7 @@
 /* Leaflet: keep map under app overlays (modals, sheets) */
 .leaflet-container {
   font: inherit;
-  background: #faf8f5;
+  background: var(--color-background);
 }
 .leaflet-popup-content-wrapper {
   border-radius: 12px;
@@ -34,6 +34,21 @@
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 
   body {

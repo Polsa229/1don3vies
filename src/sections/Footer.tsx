@@ -22,8 +22,7 @@ export function Footer() {
     <footer className="relative bg-primary-900 text-ivory-100 overflow-hidden">
       <InkBlot
         variant={1}
-        color="#FDE8E6"
-        className="absolute -top-20 -right-20 w-[400px] h-[560px] opacity-[0.04]"
+        className="absolute -top-20 -right-20 w-[400px] h-[560px] opacity-[0.04] text-accent-100"
       />
 
       <div className="container-hemo relative z-10 py-10 lg:py-16">

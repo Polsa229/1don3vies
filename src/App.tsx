@@ -6,7 +6,9 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
+import { MotionConfig } from "framer-motion";
 import { I18nProvider } from "@/i18n/I18nContext";
+import { useI18n } from "@/i18n/useI18n";
 import { Navbar } from "@/components/shared/Navbar";
 import { StickyCta } from "@/components/shared/StickyCta";
 import { Hero } from "@/sections/Hero";
@@ -63,6 +65,18 @@ function prefetchLandingChunks() {
   void import("@/sections/CentersSection");
 }
 
+function SkipToContent() {
+  const { t } = useI18n();
+  return (
+    <a
+      href="#main-content"
+      className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg"
+    >
+      {t("a11y.skipToContent")}
+    </a>
+  );
+}
+
 function LandingPage() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -76,7 +90,6 @@ function LandingPage() {
     let retryTimer: ReturnType<typeof setTimeout> | undefined;
 
     function finish() {
-      // Une fois sur l'accueil, garder une URL propre : /
       navigate("/", { replace: true });
     }
 
@@ -111,7 +124,7 @@ function LandingPage() {
   return (
     <>
       <StickyCta />
-      <main>
+      <main id="main-content">
         <Hero />
         <Suspense fallback={<div className="min-h-[50vh]" aria-hidden />}>
           <EligibilitySimulator />
@@ -147,7 +160,7 @@ function App() {
     if (loading) return;
 
     const idle =
-      typeof window.requestIdleCallback === 'function'
+      typeof window.requestIdleCallback === "function"
         ? window.requestIdleCallback
         : undefined;
     const id = idle
@@ -172,34 +185,37 @@ function App() {
 
   return (
     <I18nProvider>
-      <BrowserRouter>
-        {loading ? (
-          <LoadingScreen onComplete={handleLoadingComplete} />
-        ) : (
-          <div className="min-h-screen bg-background pb-16 lg:pb-0">
-            <Navbar />
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route
-                path="/centres"
-                element={
-                  <Suspense fallback={null}>
-                    <CentersPage />
-                  </Suspense>
-                }
-              />
-            </Routes>
-            <Footer />
-            <MobileBottomNav />
-            {widgetsReady && (
-              <Suspense fallback={null}>
-                <BackToTop />
-                <ChatWidget />
-              </Suspense>
-            )}
-          </div>
-        )}
-      </BrowserRouter>
+      <MotionConfig reducedMotion="user">
+        <BrowserRouter>
+          {loading ? (
+            <LoadingScreen onComplete={handleLoadingComplete} />
+          ) : (
+            <div className="min-h-screen bg-background pb-16 lg:pb-0">
+              <SkipToContent />
+              <Navbar />
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route
+                  path="/centres"
+                  element={
+                    <Suspense fallback={null}>
+                      <CentersPage />
+                    </Suspense>
+                  }
+                />
+              </Routes>
+              <Footer />
+              <MobileBottomNav />
+              {widgetsReady && (
+                <Suspense fallback={null}>
+                  <BackToTop />
+                  <ChatWidget />
+                </Suspense>
+              )}
+            </div>
+          )}
+        </BrowserRouter>
+      </MotionConfig>
     </I18nProvider>
   );
 }

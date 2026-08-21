@@ -198,8 +198,7 @@ export function CentersSection({
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
         <InkBlot
           variant={2}
-          color="#8F2346"
-          className="absolute top-10 -left-40 w-[500px] h-[700px] opacity-[0.03]"
+          className="absolute top-10 -left-40 w-[500px] h-[700px] opacity-[0.03] text-primary"
         />
       </div>
 

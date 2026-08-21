@@ -35,6 +35,7 @@ export const translations = {
     'mobileNav.faq': 'FAQ',
     'mobileNav.label': 'Navigation mobile',
     'backToTop.label': 'Retour en haut',
+    'a11y.skipToContent': 'Aller au contenu principal',
 
     // Typewriter
     'typewriter.fr': 'Est-ce que je peux donner mon sang ?',
@@ -344,6 +345,7 @@ export const translations = {
     'mobileNav.faq': 'FAQ',
     'mobileNav.label': 'Mobile navigation',
     'backToTop.label': 'Back to top',
+    'a11y.skipToContent': 'Skip to main content',
 
     // Typewriter
     'typewriter.fr': 'Est-ce que je peux donner mon sang ?',

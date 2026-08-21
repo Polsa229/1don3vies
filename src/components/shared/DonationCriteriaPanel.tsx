@@ -22,6 +22,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useI18n } from "@/i18n/useI18n";
 import type { TranslationKey } from "@/i18n/translations";
+import { themeColors } from "@/lib/theme-colors";
 
 type Tab = "can" | "cannot";
 
@@ -103,8 +104,8 @@ function CriteriaExportPoster({
     <div
       className="w-[1080px] p-12"
       style={{
-        backgroundColor: "#FAF8F5",
-        color: "#241C20",
+        backgroundColor: themeColors.background,
+        color: themeColors.foreground,
         fontFamily: "system-ui, sans-serif",
       }}
     >
@@ -114,24 +115,29 @@ function CriteriaExportPoster({
           borderColor: isCan
             ? "rgba(38, 122, 90, 0.28)"
             : "rgba(143, 35, 70, 0.28)",
-          backgroundColor: "#FFFFFF",
+          backgroundColor: themeColors.surface,
         }}
       >
         <div className="flex items-center gap-3 mb-8">
           <span
             className="inline-flex h-10 w-10 items-center justify-center rounded-full text-white"
-            style={{ backgroundColor: isCan ? "#267A5A" : "#8F2346" }}
+            style={{
+              backgroundColor: isCan ? themeColors.success : themeColors.primary,
+            }}
           >
             {isCan ? <Check className="h-5 w-5" /> : <X className="h-5 w-5" />}
           </span>
           <div>
             <p
               className="text-xs font-bold uppercase tracking-[0.18em]"
-              style={{ color: "#8F2346" }}
+              style={{ color: themeColors.primary }}
             >
               1Don3Vies
             </p>
-            <h2 className="text-2xl font-semibold" style={{ color: "#691735" }}>
+            <h2
+              className="text-2xl font-semibold"
+              style={{ color: themeColors.primaryDark }}
+            >
               {t(isCan ? "criteria.tab.can" : "criteria.tab.cannot")}
             </h2>
           </div>
@@ -139,7 +145,7 @@ function CriteriaExportPoster({
 
         <p
           className="text-base leading-relaxed mb-8"
-          style={{ color: "#6F6669" }}
+          style={{ color: themeColors.muted }}
         >
           {t(isCan ? "criteria.can.intro" : "ineligible.subtitle")}
         </p>
@@ -151,7 +157,7 @@ function CriteriaExportPoster({
               <li
                 key={item.key}
                 className="flex items-center gap-3 rounded-xl px-4 py-3"
-                style={{ backgroundColor: "#F8F5F2" }}
+                style={{ backgroundColor: themeColors.ivorySoft }}
               >
                 <span
                   className="shrink-0 w-9 h-9 rounded-lg flex items-center justify-center"
@@ -159,14 +165,14 @@ function CriteriaExportPoster({
                     backgroundColor: isCan
                       ? "rgba(38, 122, 90, 0.12)"
                       : "rgba(143, 35, 70, 0.1)",
-                    color: isCan ? "#267A5A" : "#8F2346",
+                    color: isCan ? themeColors.success : themeColors.primary,
                   }}
                 >
                   <Icon className="w-4 h-4" strokeWidth={2.25} />
                 </span>
                 <p
                   className="text-[15px] leading-snug"
-                  style={{ color: "#3F383A" }}
+                  style={{ color: themeColors.mutedAlt }}
                 >
                   {t(item.key)}
                 </p>
@@ -178,7 +184,7 @@ function CriteriaExportPoster({
         {!isCan && (
           <p
             className="mt-8 text-sm leading-relaxed"
-            style={{ color: "#6F6669" }}
+            style={{ color: themeColors.muted }}
           >
             {t("ineligible.footer")}
           </p>
@@ -186,7 +192,7 @@ function CriteriaExportPoster({
 
         <p
           className="mt-6 text-xs leading-relaxed"
-          style={{ color: "#8A8284" }}
+          style={{ color: themeColors.mutedSoft }}
         >
           {t("ineligible.disclaimer")}
         </p>
@@ -214,7 +220,7 @@ export function DonationCriteriaPanel() {
         quality: 0.95,
         pixelRatio: 2,
         cacheBust: true,
-        backgroundColor: "#FAF8F5",
+        backgroundColor: themeColors.background,
       });
 
       const slug = tab === "can" ? "qui-peut-donner" : "qui-ne-peut-pas-donner";

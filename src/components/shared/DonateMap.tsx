@@ -4,6 +4,7 @@ import L from 'leaflet';
 import { Crosshair, Maximize2, Minimize2 } from 'lucide-react';
 import { useI18n } from '@/i18n/useI18n';
 import { directionsUrl } from '@/lib/maps';
+import { themeColors } from '@/lib/theme-colors';
 import 'leaflet/dist/leaflet.css';
 
 export interface MapMarkerItem {
@@ -28,8 +29,8 @@ const DEFAULT_ZOOM = 7;
 function createPinIcon() {
   const svg = encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42" fill="none">
-      <path d="M16 0C7.163 0 0 7.163 0 16c0 10.5 16 26 16 26s16-15.5 16-26C32 7.163 24.837 0 16 0z" fill="#8F2346"/>
-      <circle cx="16" cy="16" r="6.5" fill="#FAF8F5"/>
+      <path d="M16 0C7.163 0 0 7.163 0 16c0 10.5 16 26 16 26s16-15.5 16-26C32 7.163 24.837 0 16 0z" fill="${themeColors.primary}"/>
+      <circle cx="16" cy="16" r="6.5" fill="${themeColors.background}"/>
     </svg>`,
   );
   return L.icon({
@@ -149,8 +150,8 @@ export function DonateMap({ markers, userCoords = null, onSelect, className = ''
             center={[userCoords.lat, userCoords.lng]}
             radius={9}
             pathOptions={{
-              color: '#E86A5B',
-              fillColor: '#E86A5B',
+              color: themeColors.accent,
+              fillColor: themeColors.accent,
               fillOpacity: 0.85,
               weight: 3,
             }}
@@ -163,8 +164,8 @@ export function DonateMap({ markers, userCoords = null, onSelect, className = ''
           <Marker key={m.id} position={[m.lat, m.lng]} icon={pinIcon}>
             <Popup>
               <div className="min-w-[168px] max-w-[240px]">
-                <p className="font-semibold text-sm text-[#241c20] leading-snug mb-0.5">{m.name}</p>
-                <p className="text-xs text-[#6f6669] mb-2.5">
+                <p className="font-semibold text-sm text-foreground leading-snug mb-0.5">{m.name}</p>
+                <p className="text-xs text-muted mb-2.5">
                   {m.city}
                   {m.subtitle ? ` · ${m.subtitle}` : ''}
                 </p>
@@ -173,14 +174,14 @@ export function DonateMap({ markers, userCoords = null, onSelect, className = ''
                     href={directionsUrl(m.lat, m.lng, userCoords)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block w-full text-center rounded-full border border-[#8F2346] text-[#8F2346] text-xs font-semibold px-3 py-1.5 hover:bg-[#8F2346]/[0.06] transition-colors"
+                    className="block w-full text-center rounded-full border border-primary text-primary text-xs font-semibold px-3 py-1.5 hover:bg-primary/[0.06] transition-colors"
                   >
                     {t('centers.map.directions')}
                   </a>
                   <button
                     type="button"
                     onClick={() => onSelect(m.id)}
-                    className="w-full rounded-full bg-[#8F2346] text-white text-xs font-semibold px-3 py-1.5 hover:bg-[#691735] transition-colors"
+                    className="w-full rounded-full bg-primary text-white text-xs font-semibold px-3 py-1.5 hover:bg-primary-dark transition-colors"
                   >
                     {t('centers.map.details')}
                   </button>

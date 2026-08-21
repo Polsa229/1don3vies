@@ -78,6 +78,7 @@ export function Navbar() {
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={t(mobileOpen ? "nav.menu.close" : "nav.menu.open")}
             aria-expanded={mobileOpen}
+            aria-controls="mobile-nav-menu"
           >
             {mobileOpen ? (
               <X className="w-5 h-5" />
@@ -89,7 +90,10 @@ export function Navbar() {
       </nav>
 
       {mobileOpen && (
-        <div className="lg:hidden border-t border-warmgray-200/50 bg-ivory-50 animate-fade-in">
+        <div
+          id="mobile-nav-menu"
+          className="lg:hidden border-t border-warmgray-200/50 bg-ivory-50 animate-fade-in"
+        >
           <div className="container-hemo py-4 flex flex-col gap-1">
             {NAV_ITEMS.map((item) => (
               <button

@@ -120,8 +120,7 @@ export function EligibilitySimulator() {
     >
       <InkBlot
         variant={2}
-        color="#691735"
-        className="absolute top-20 -right-40 w-[500px] h-[700px] opacity-[0.03]"
+        className="absolute top-20 -right-40 w-[500px] h-[700px] opacity-[0.03] text-primary-dark"
       />
 
       <div className="container-hemo relative z-10">
@@ -429,7 +428,7 @@ function DonorCard() {
     <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-700 via-primary-800 to-primary-900 p-8 shadow-2xl shadow-primary-900/30">
       {/* Decorative ink blot */}
       <div className="absolute -top-10 -right-10 w-48 h-48 opacity-10">
-        <InkBlot variant={4} color="#FDE8E6" className="w-full h-full" />
+        <InkBlot variant={4} className="w-full h-full text-accent-100" />
       </div>
 
       <div className="relative z-10">

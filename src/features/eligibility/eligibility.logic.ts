@@ -77,9 +77,3 @@ export function checkEligibility(input: EligibilityInput, lang: 'fr' | 'en' = 'f
         : 'According to this guide\'s criteria, you can donate.',
   };
 }
-
-export function formatDateForDisplay(isoDate: string, lang: 'fr' | 'en' = 'fr'): string {
-  return formatDate(new Date(isoDate), lang);
-}
-
-export { formatDate };

@@ -7,7 +7,7 @@ export function CentersPage() {
   }, []);
 
   return (
-    <main className="pt-16 lg:pt-20">
+    <main id="main-content" className="pt-16 lg:pt-20">
       <CentersSection compact />
     </main>
   );

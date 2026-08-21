@@ -79,8 +79,7 @@ export function WhyDonateSection() {
     <section id="why" className="relative py-8 lg:py-24 overflow-hidden">
       <InkBlot
         variant={1}
-        color="#6B1F35"
-        className="absolute -bottom-40 -right-32 w-[500px] h-[700px] opacity-[0.03]"
+        className="absolute -bottom-40 -right-32 w-[500px] h-[700px] opacity-[0.03] text-primary-800"
       />
 
       <div className="container-hemo relative z-10">
@@ -159,13 +158,11 @@ export function WhyDonateSection() {
               <div className="absolute inset-0 opacity-20">
                 <InkBlot
                   variant={3}
-                  color="#FFEDD0"
-                  className="absolute top-0 right-0 w-48 h-64"
+                  className="absolute top-0 right-0 w-48 h-64 text-warning-100"
                 />
                 <InkBlot
                   variant={4}
-                  color="#FFC070"
-                  className="absolute bottom-0 left-0 w-40 h-52"
+                  className="absolute bottom-0 left-0 w-40 h-52 text-warning-400"
                 />
               </div>
 

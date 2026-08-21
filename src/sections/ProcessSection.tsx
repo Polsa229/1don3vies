@@ -76,8 +76,7 @@ export function ProcessSection() {
     >
       <InkBlot
         variant={3}
-        color="#8F2346"
-        className="absolute -bottom-32 -left-32 w-[450px] h-[600px] opacity-[0.03]"
+        className="absolute -bottom-32 -left-32 w-[450px] h-[600px] opacity-[0.03] text-primary"
       />
 
       <div className="container-hemo relative z-10">

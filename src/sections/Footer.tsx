@@ -10,12 +10,12 @@ export function Footer() {
   const location = useLocation();
 
   const navItems = [
-    { id: "eligibility", label: t("nav.eligibility" as never) },
-    { id: "process", label: t("nav.process" as never) },
-    { id: "centers", label: t("nav.centers" as never) },
-    { id: "reserves", label: t("nav.reserves" as never) },
-    { id: "why", label: t("nav.why" as never) },
-    { id: "faq", label: t("nav.faq" as never) },
+    { id: "eligibility", label: t("nav.eligibility") },
+    { id: "process", label: t("nav.process") },
+    { id: "centers", label: t("nav.centers") },
+    { id: "reserves", label: t("nav.reserves") },
+    { id: "why", label: t("nav.why") },
+    { id: "faq", label: t("nav.faq") },
   ];
 
   return (

@@ -29,7 +29,7 @@ export function BackToTop() {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.8, y: 10 }}
           transition={{ duration: 0.2 }}
-          aria-label={t("backToTop.label" as never)}
+          aria-label={t("backToTop.label")}
         >
           <ArrowUp className="w-5 h-5" />
         </motion.button>

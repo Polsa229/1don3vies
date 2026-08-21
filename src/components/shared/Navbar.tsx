@@ -42,7 +42,7 @@ export function Navbar() {
           type="button"
           onClick={handleHome}
           className="flex items-center gap-2.5 group"
-          aria-label={t("nav.home.label" as never)}
+          aria-label={t("nav.home.label")}
         >
           <span className="relative flex items-center justify-center w-9 h-9 rounded-full bg-primary transition-transform group-hover:scale-105">
             <Droplet className="w-5 h-5 text-white" fill="currentColor" />
@@ -65,7 +65,7 @@ export function Navbar() {
                   : "text-warmgray-600 hover:text-primary-700 hover:bg-primary-50/50"
               }`}
             >
-              {t(item.key as never)}
+              {t(item.key)}
             </button>
           ))}
         </div>
@@ -76,9 +76,7 @@ export function Navbar() {
             type="button"
             className="lg:hidden p-2 rounded-full hover:bg-warmgray-100 transition-colors"
             onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label={t(
-              (mobileOpen ? "nav.menu.close" : "nav.menu.open") as never,
-            )}
+            aria-label={t(mobileOpen ? "nav.menu.close" : "nav.menu.open")}
             aria-expanded={mobileOpen}
           >
             {mobileOpen ? (
@@ -105,7 +103,7 @@ export function Navbar() {
                     : "text-warmgray-600 hover:bg-warmgray-50"
                 }`}
               >
-                {t(item.key as never)}
+                {t(item.key)}
               </button>
             ))}
           </div>

@@ -42,7 +42,7 @@ export function MobileBottomNav() {
   return (
     <nav
       className="fixed bottom-0 inset-x-0 z-40 lg:hidden border-t border-warmgray-200/80 bg-surface/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)]"
-      aria-label={t('mobileNav.label' as never)}
+      aria-label={t('mobileNav.label')}
     >
       <div className="grid grid-cols-4 max-w-lg mx-auto">
         {ITEMS.map(({ id, icon: Icon, labelKey }) => {

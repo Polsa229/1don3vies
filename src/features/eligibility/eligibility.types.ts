@@ -1,3 +1,5 @@
+import type { TranslationKey } from '@/i18n/translations';
+
 export type Gender = 'male' | 'female';
 
 export type DonationType = 'whole' | 'plasma' | 'platelets';
@@ -85,6 +87,6 @@ export interface EligibilityResult {
 }
 
 export interface FAQItem {
-  qKey: string;
-  aKey: string;
+  qKey: TranslationKey;
+  aKey: TranslationKey;
 }

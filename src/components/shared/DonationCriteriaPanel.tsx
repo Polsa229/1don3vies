@@ -21,10 +21,11 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useI18n } from "@/i18n/useI18n";
+import type { TranslationKey } from "@/i18n/translations";
 
 type Tab = "can" | "cannot";
 
-const CAN_CRITERIA: { key: string; icon: LucideIcon }[] = [
+const CAN_CRITERIA: { key: TranslationKey; icon: LucideIcon }[] = [
   { key: "criteria.can.age", icon: Users },
   { key: "criteria.can.health", icon: ShieldCheck },
   { key: "criteria.can.weight", icon: Weight },
@@ -35,7 +36,7 @@ const CAN_CRITERIA: { key: string; icon: LucideIcon }[] = [
   { key: "criteria.can.alcohol", icon: Coffee },
 ];
 
-const CANNOT_CRITERIA: { key: string; icon: LucideIcon }[] = [
+const CANNOT_CRITERIA: { key: TranslationKey; icon: LucideIcon }[] = [
   { key: "ineligible.item.age", icon: Users },
   { key: "ineligible.item.infections", icon: Biohazard },
   { key: "ineligible.item.weight", icon: Weight },
@@ -50,7 +51,7 @@ function CriteriaGrid({
   items,
   variant,
 }: {
-  items: { key: string; icon: LucideIcon }[];
+  items: { key: TranslationKey; icon: LucideIcon }[];
   variant: Tab;
 }) {
   const { t } = useI18n();
@@ -79,7 +80,7 @@ function CriteriaGrid({
               <Icon className="w-4 h-4" strokeWidth={2.25} />
             </span>
             <span className="text-sm text-warmgray-700 leading-snug">
-              {t(item.key as never)}
+              {t(item.key)}
             </span>
           </motion.li>
         );
@@ -93,7 +94,7 @@ function CriteriaExportPoster({
   items,
 }: {
   variant: Tab;
-  items: { key: string; icon: LucideIcon }[];
+  items: { key: TranslationKey; icon: LucideIcon }[];
 }) {
   const { t } = useI18n();
   const isCan = variant === "can";
@@ -167,7 +168,7 @@ function CriteriaExportPoster({
                   className="text-[15px] leading-snug"
                   style={{ color: "#3F383A" }}
                 >
-                  {t(item.key as never)}
+                  {t(item.key)}
                 </p>
               </li>
             );

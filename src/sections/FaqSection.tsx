@@ -77,7 +77,7 @@ export function FaqSection() {
                     <span
                       className={`font-display text-sm sm:text-lg transition-colors ${isOpen ? "text-primary-800" : "text-primary-900"}`}
                     >
-                      {t(item.qKey as never)}
+                      {t(item.qKey)}
                     </span>
                     <motion.span
                       animate={{ rotate: isOpen ? 180 : 0 }}
@@ -105,7 +105,7 @@ export function FaqSection() {
                         className="overflow-hidden"
                       >
                         <p className="px-5 sm:px-6 pb-5 text-sm sm:text-base text-warmgray-600 leading-relaxed">
-                          {t(item.aKey as never)}
+                          {t(item.aKey)}
                         </p>
                       </motion.div>
                     )}

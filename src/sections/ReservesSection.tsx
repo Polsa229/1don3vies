@@ -3,6 +3,7 @@ import { SectionHeading } from '@/components/shared/SectionHeading';
 import { InkBlot } from '@/components/shared/InkBlot';
 import { bloodReserves } from '@/data/bloodReserves.data';
 import type { NeedLevel } from '@/features/eligibility/eligibility.types';
+import type { TranslationKey } from '@/i18n/translations';
 import { Info, Globe } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { fadeUp, staggerContainer, viewportOnce } from '@/lib/motion';
@@ -16,7 +17,7 @@ const levelConfig: Record<
     fill: string;
     empty: string;
     text: string;
-    labelKey: string;
+    labelKey: TranslationKey;
     /** How many of 5 blocks are filled (stock metaphor: high need = low stock). */
     filled: number;
   }
@@ -144,7 +145,7 @@ export function ReservesSection() {
                   fillClass={config.fill}
                   emptyClass={config.empty}
                   textClass={config.text}
-                  label={t(config.labelKey as never)}
+                  label={t(config.labelKey)}
                   delay={0.05 + index * 0.04}
                 />
 

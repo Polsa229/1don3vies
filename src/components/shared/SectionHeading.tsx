@@ -1,9 +1,10 @@
-import { useI18n } from "@/i18n/useI18n";
+import { useI18n } from '@/i18n/useI18n';
+import type { TranslationKey } from '@/i18n/translations';
 
 interface SectionHeadingProps {
-  eyebrowKey: string;
-  titleKey: string;
-  subtitleKey?: string;
+  eyebrowKey: TranslationKey;
+  titleKey: TranslationKey;
+  subtitleKey?: TranslationKey;
   center?: boolean;
   className?: string;
 }
@@ -13,21 +14,21 @@ export function SectionHeading({
   titleKey,
   subtitleKey,
   center = true,
-  className = "",
+  className = '',
 }: SectionHeadingProps) {
   const { t } = useI18n();
 
   return (
     <div
-      className={`mb-6 lg:mb-12 ${center ? "text-center mx-auto max-w-2xl" : "max-w-2xl"} ${className}`}
+      className={`mb-6 lg:mb-12 ${center ? 'text-center mx-auto max-w-2xl' : 'max-w-2xl'} ${className}`}
     >
-      <p className="eyebrow mb-3">{t(eyebrowKey as never)}</p>
+      <p className="eyebrow mb-3">{t(eyebrowKey)}</p>
       <h2 className="heading-display text-2xl sm:text-4xl lg:text-5xl leading-[1.15] text-balance">
-        {t(titleKey as never)}
+        {t(titleKey)}
       </h2>
       {subtitleKey && (
         <p className="mt-2 sm:mt-4 text-warmgray-600 text-sm sm:text-lg leading-relaxed">
-          {t(subtitleKey as never)}
+          {t(subtitleKey)}
         </p>
       )}
     </div>
@@ -35,11 +36,11 @@ export function SectionHeading({
 }
 
 interface QuoteBlockProps {
-  quoteKey: string;
+  quoteKey: TranslationKey;
   className?: string;
 }
 
-export function QuoteBlock({ quoteKey, className = "" }: QuoteBlockProps) {
+export function QuoteBlock({ quoteKey, className = '' }: QuoteBlockProps) {
   const { t } = useI18n();
 
   return (
@@ -49,7 +50,7 @@ export function QuoteBlock({ quoteKey, className = "" }: QuoteBlockProps) {
       </div>
       <blockquote className="relative text-center px-4 sm:px-6">
         <p className="heading-display text-[12px] sm:text-3xl lg:text-4xl text-primary-800 italic leading-none whitespace-nowrap tracking-tight">
-          &ldquo;{t(quoteKey as never)}&rdquo;
+          &ldquo;{t(quoteKey)}&rdquo;
         </p>
       </blockquote>
     </div>
